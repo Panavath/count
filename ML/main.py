@@ -4,13 +4,18 @@ import cv2
 import numpy as np
 import requests
 import io
+import os
 
+# Initialize FastAPI app
 app = FastAPI()
 
-# Load model once at startup
+# Load YOLOv8 model once when the app starts
 model = YOLO("yolov8n.pt")
+
+# USDA API Key (make sure to store it securely in environment variables in production)
 API_KEY = "C63N4f7cCCjCwDSrw4aTnZcuycqJgQwDbTwPE2nR"
 
+# Function to fetch nutrition info from the USDA API
 def get_nutrition_info_usda(query):
     url = "https://api.nal.usda.gov/fdc/v1/foods/search"
     params = {
@@ -44,6 +49,7 @@ def get_nutrition_info_usda(query):
     else:
         return {"error": f"Request failed with status code {response.status_code}"}
 
+# Endpoint to analyze images and detect food items
 @app.post("/analyze")
 async def analyze_image(file: UploadFile = File(...)):
     # Read image file into memory
@@ -79,3 +85,8 @@ async def analyze_image(file: UploadFile = File(...)):
         "detected_foods": detected_foods,
         "nutrition_data": nutrition_data
     }
+
+# Run the FastAPI app locally (useful for development and testing)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=5000)

@@ -70,7 +70,7 @@ async def analyze_image(file: UploadFile = File(...)):
         
         detected_foods.append({
             "class_name": class_name,
-            "confidence": conf,
+            "confidence": conf, 
             "bbox": bbox
         })
     

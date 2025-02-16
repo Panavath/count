@@ -116,7 +116,7 @@ python-json-logger==2.0.7
 python-multipart==0.0.20
 pytweening==1.2.0
 pytz==2024.2
-pywin32==307
+# pywin32==307
 pywin32-ctypes==0.2.3
 pywinpty==2.0.13
 PyYAML==6.0.2

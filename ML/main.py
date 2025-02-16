@@ -3,7 +3,6 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import requests
-import io
 import os
 
 # Initialize FastAPI app
@@ -12,40 +11,38 @@ app = FastAPI()
 # Load YOLOv8 model once when the app starts
 model = YOLO("yolov8n.pt")
 
-# USDA API Key (make sure to store it securely in environment variables in production)
-API_KEY = "C63N4f7cCCjCwDSrw4aTnZcuycqJgQwDbTwPE2nR"
+# Edamam API Key and App ID (replace with your actual API key and App ID)
+EDAMAM_API_KEY = "22805abcf1441f12113db820df00139a"
+EDAMAM_APP_ID = "c422ee64"
 
-# Function to fetch nutrition info from the USDA API
-def get_nutrition_info_usda(query):
-    url = "https://api.nal.usda.gov/fdc/v1/foods/search"
+# Function to fetch nutrition info from the Edamam Food Database API
+def get_nutrition_info_edamam(food_item):
+    url = "https://api.edamam.com/api/food-database/v2/parser"
     params = {
-        "query": query,
-        "api_key": API_KEY,
-        "pageSize": 1
+        "ingr": food_item,  # The food item to search for
+        "app_id": EDAMAM_APP_ID,
+        "app_key": EDAMAM_API_KEY,
+        "nutrition-type": "cooking"  # Optional: Include if needed
     }
     
     response = requests.get(url, params=params)
     if response.status_code == 200:
         data = response.json()
-        foods = data.get("foods", [])
-        if foods:
-            food = foods[0]
-            description = food.get("description", "Unknown")
-            nutrients = {nutrient['nutrientId']: nutrient['value'] for nutrient in food.get("foodNutrients", [])}
-            calories = nutrients.get(1008, "N/A")
-            protein  = nutrients.get(1003, "N/A")
-            fat      = nutrients.get(1004, "N/A")
-            carbs    = nutrients.get(1005, "N/A")
+        if "hints" in data and data["hints"]:
+            # Pick the first result
+            food = data["hints"][0]["food"]
+            label = food.get("label", "Unknown")
+            nutrients = food.get("nutrients", {})
             
             return {
-                "Description": description,
-                "Calories (kcal/100g)": calories,
-                "Protein (g/100g)": protein,
-                "Fat (g/100g)": fat,
-                "Carbohydrates (g/100g)": carbs
+                "Description": label,
+                "Calories (kcal/100g)": nutrients.get("ENERC_KCAL", "N/A"),
+                "Protein (g/100g)": nutrients.get("PROCNT", "N/A"),
+                "Fat (g/100g)": nutrients.get("FAT", "N/A"),
+                "Carbohydrates (g/100g)": nutrients.get("CHOCDF", "N/A")
             }
         else:
-            return {"error": "No food items found for this query."}
+            return {"error": f"No food items found for '{food_item}'."}
     else:
         return {"error": f"Request failed with status code {response.status_code}"}
 
@@ -74,10 +71,10 @@ async def analyze_image(file: UploadFile = File(...)):
             "bbox": bbox
         })
     
-    # If food detected, query USDA API for the first detected food
+    # If food detected, query Edamam API for the first detected food
     if detected_foods:
         food_item = detected_foods[0]["class_name"]
-        nutrition_data = get_nutrition_info_usda(food_item)
+        nutrition_data = get_nutrition_info_edamam(food_item)
     else:
         nutrition_data = {"error": "No food detected."}
     

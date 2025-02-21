@@ -1,15 +1,11 @@
 from fastapi import FastAPI
 
-from models.user_model import User
+from routes import *
+app = FastAPI(title="My Backend API")
 
-app = FastAPI()
+# Include your routes
+app.include_router(userRouter, prefix="", tags=["users"])
 
 @app.get("/")
-def read_root(user: User):
-    return {"message": f"Hello, {user.name}"}
-
-@app.put("/{user.id}")
-def put_user(id: int ,user: User):
-    return user.id
-    
-
+def read_root():
+    return {"message": "Hello, world!"}

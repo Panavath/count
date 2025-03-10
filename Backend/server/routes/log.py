@@ -6,8 +6,6 @@ from pydantic import BaseModel
 class test(BaseModel):
     name: str
 
-__all__ = ['log_router']
-
 log_router = Router(prefix='/log', tags=['log'])
 
 

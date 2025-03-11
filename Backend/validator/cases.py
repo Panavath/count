@@ -18,6 +18,8 @@ class Case:
     body: dict[str, Any]
     expected_code: int
     expected_content: dict[str, Any]
+    image_path: str | None = None
+    image_type: Literal['image/jpeg', 'image/png'] | None = None
 
 
 cases: list[Case] = [
@@ -31,7 +33,7 @@ cases: list[Case] = [
     ),
     Case(
         name='Log',
-        endpoint='/log',
+        endpoint='/log/',
         method='GET',
         body={},
         expected_code=200,
@@ -39,10 +41,24 @@ cases: list[Case] = [
     ),
     Case(
         name='Log food',
-        endpoint='/log/food',
+        endpoint='/log/food/',
         method='POST',
         body={'name': 'Banana'},
         expected_code=200,
-        expected_content={'name': 'Banana'}
+        expected_content={'name': 'Banana'},
+    ),
+    Case(
+        name='Upload image',
+        endpoint='/log/scan/',
+        method='POST',
+        body={},
+        expected_code=200,
+        expected_content={
+            'filename': 'temp.jpg',
+            'content_type': 'image/jpeg',
+            'file_path': 'cache\\temp.jpg',
+        },
+        image_path='assets/rock.jpg',
+        image_type='image/jpeg',
     ),
 ]

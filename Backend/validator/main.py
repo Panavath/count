@@ -21,12 +21,21 @@ if __name__ == '__main__':
               BColor.UNDERLINE + test.endpoint + BColor.ENDC)
         print(BColor.CYAN + 'Method:' + BColor.ENDC, test.method)
 
+        files = None
+
+        if test.image_path is not None:
+            if test.image_type is None:
+                raise ValueError('Error: No image type specified')
+
+            with open(test.image_path, 'rb') as file:
+                files = {'file': (test.image_path, file.read(), test.image_type)}
+
         try:
             if test.method == 'POST':
-                response = requests.post(
-                    URL + test.endpoint, json=test.body)
+                response = session.post(
+                    URL + test.endpoint, json=test.body, files=files)
             else:
-                response = requests.get(URL + test.endpoint)
+                response = session.get(URL + test.endpoint)
 
             print(
                 BColor.GREEN + f'[+] Request successful ({response.status_code})' + BColor.ENDC)

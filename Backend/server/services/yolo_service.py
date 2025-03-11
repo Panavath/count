@@ -15,7 +15,7 @@ class YoloService:
         cls._instance = instance
 
     @classmethod
-    def analize_image(cls, file_content: bytes) -> list[ScannedFood]:
+    def analyze_image(cls, file_content: bytes) -> list[ScannedFood]:
         """
         Analyze the file content for foods.
 

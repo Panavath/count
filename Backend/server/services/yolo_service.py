@@ -9,6 +9,13 @@ class YoloService:
     model: YOLO
 
     @classmethod
+    def get_instance(cls) -> YoloService:
+        if cls._instance is None:
+            raise RuntimeError('YOLO service is not initialized.')
+
+        return cls._instance
+
+    @classmethod
     def initialize(cls, model: YOLO) -> None:
         instance = YoloService()
         instance.model = model

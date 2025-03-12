@@ -10,13 +10,24 @@ from schemas.food import ScannedFood
 
 
 class EdamamService:
-    _instance: EdamamService
-    repository: BaseEdamamRepository
+    _instance: EdamamService | None = None
+    _repository: BaseEdamamRepository
+    
+    @classmethod
+    def get_instance(cls) -> EdamamService:
+        if cls._instance is None:
+            raise RuntimeError('Edamam service is not initialized.')
+        
+        return cls._instance
+
+    @property
+    def repository(self) -> BaseEdamamRepository:
+        return self._repository
 
     @classmethod
     def initialize(cls, repo: BaseEdamamRepository) -> None:
         instance = EdamamService()
-        instance.repository = repo
+        instance._repository = repo
         cls._instance = instance
 
     @classmethod

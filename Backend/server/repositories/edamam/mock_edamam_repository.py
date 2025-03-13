@@ -13,7 +13,7 @@ class MockEdamamRepository(BaseEdamamRepository):
 
     def get_nutrition_info(
         self, scanned_food: ScannedFood
-    ) -> list[EdamamNutritionInfo]:
+    ) -> EdamamNutritionInfo:
         """
         Returns a mock data
 
@@ -23,12 +23,10 @@ class MockEdamamRepository(BaseEdamamRepository):
         Returns:
             list[EdamamNutritionInfo]: Mock data
         """
-        return [
-            EdamamNutritionInfo(
-                description="idk",
-                calories=180.0,
-                protein=100.0,
-                fat=30.0,
-                carbohydrates=100.0,
-            )
-        ]
+        return EdamamNutritionInfo(
+            description="idk",
+            calories=180.0,
+            protein=100.0,
+            fat=30.0,
+            carbs=100.0,
+        )

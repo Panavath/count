@@ -7,4 +7,4 @@ class EdamamNutritionInfo(BaseModel):
     calories: float
     protein: float
     fat: float
-    carbohydrates: float
+    carbs: float

@@ -1,6 +1,7 @@
 from typing import Optional, Any
 
 from pydantic import BaseModel
+from .edamam import EdamamNutritionInfo
 
 class BaseFood(BaseModel):
     name: str
@@ -11,4 +12,5 @@ class BaseFood(BaseModel):
 class ScannedFood(BaseModel):
     class_name: str
     confidence: float
-    bbox: list 
+    bbox: list
+    nutrition_info: Optional[EdamamNutritionInfo]

@@ -14,7 +14,7 @@ _database_url = os.environ.get('DATABASE_URL')
 if _env_mode not in ['PROD', 'DEV', 'TEST']:
     _env_mode = 'DEV'
 
-if any([_edamam_api_key, _edamam_api_key, _database_url]):
+if not all([_edamam_api_key, _edamam_api_key, _database_url]):
     raise EnvironmentError('Enviroment variables not found.')
 
 type EnvModeT = Literal['PROD', 'DEV', 'TEST']

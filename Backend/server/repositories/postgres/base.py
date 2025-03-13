@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 T = TypeVar('T')
 
 
-class BaseRepository(ABC, Generic[T]):
+class BaseDBRepository(ABC, Generic[T]):
     def __init__(self, db: Session | None, model: type[T]) -> None:
         self._db = db
         self.model = model
-        
+
     @property
     def db(self) -> Session:
         if self._db is None:

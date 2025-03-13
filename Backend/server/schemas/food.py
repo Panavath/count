@@ -11,4 +11,4 @@ class BaseFood(BaseModel):
 class ScannedFood(BaseModel):
     class_name: str
     confidence: float
-    bbox: Any  # change to its type
+    bbox: list 

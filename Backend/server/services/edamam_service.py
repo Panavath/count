@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+import os
+from config import EDAMAM_API_KEY, EDAMAM_APP_ID
+from json import requests
+
 from typing import Sequence
 
 from ultralytics import YOLO
@@ -31,14 +35,18 @@ class EdamamService:
         cls._instance = instance
 
     @classmethod
-    def get_nutrition_info(cls, food: ScannedFood | Sequence[ScannedFood]) -> list[EdamamNutritionInfo]:
-        """
-        Gets the nutrition informations for the provided food or list of foods
+    def get_nutrition_info(cls, foods: ScannedFood | Sequence[ScannedFood]) -> list[EdamamNutritionInfo]:
+        if isinstance(foods, ScannedFood):
+            foods = [foods]
 
-        Args:
-            food (ScannedFood | Sequence[ScannedFood]): list of foods
+        nutrition_info_list = []
+        for food in foods:
+            try:
+                nutrition_info = cls._instance.repository.get_nutrition_info(food)
+                nutrition_info_list.append(nutrition_info)
+            except RuntimeError as e:
+                raise RuntimeError(f"Failed to fetch nutrition info for '{food.name}': {e}")
 
-        Returns:
-            list[EdamamNutritionInfo]: might be incorrect plz chek
-        """
-        ...  # TODO: DS team
+        return nutrition_info_list
+
+                

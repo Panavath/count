@@ -20,13 +20,33 @@ class EdamamRepository(BaseEdamamRepository):
         self._app_id = EDAMAM_APP_ID
 
     def get_nutrition_info(self, scanned_food: ScannedFood) -> list[EdamamNutritionInfo]:
-        """
-        Get the nutrition informations of the scanned food from the Edamam API.
-        
-        Args:
-            scanned_food (ScannedFood): data from the scanned food
-            
-        Returns:
-            list[EdamamNutritionInfo]: ...
-        """
-        ... # TODO: DS team
+        params = {
+            "ingr": scanned_food.name, 
+            "app_id": self._app_id,
+            "app_key": self._api_key,
+            "nutrition-type": "cooking"
+        }
+
+        response = self._session.get(
+            f"{self._url}{self._nutrition_info_endpoint}",
+            params=params
+        )
+
+        if response.status_code != 200:
+            raise RuntimeError(f"Request failed for '{scanned_food.name}' with status code {response.status_code}")
+
+        data = response.json()
+        if "hints" not in data or not data["hints"]:
+            raise RuntimeError(f"No food items found for '{scanned_food.name}'.")
+
+        food_data = data["hints"][0]["food"]
+        label = food_data.get("label", "Unknown")
+        nutrients = food_data.get("nutrients", {})
+
+        return EdamamNutritionInfo(
+            description=label,
+            calories=nutrients.get("ENERC_KCAL", "N/A"),
+            protein=nutrients.get("PROCNT", "N/A"),
+            fat=nutrients.get("FAT", "N/A"),
+            carbs=nutrients.get("CHOCDF", "N/A")
+        )

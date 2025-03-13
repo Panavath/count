@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from ultralytics import YOLO
+import cv2
+import numpy as np
 
 from schemas.food import ScannedFood
 
@@ -23,13 +25,26 @@ class YoloService:
 
     @classmethod
     def analyze_image(cls, file_content: bytes) -> list[ScannedFood]:
-        """
-        Analyze the file content for foods.
+        np_img = np.frombuffer(file_content, np.uint8)
+        img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 
-        Args:
-            file_content (bytes): the image data in bytes
+        if img is None:
+            raise RuntimeError("Failed to decode the image.")
 
-        Returns:
-            list[ScannedFood]: the list of detected food informations
-        """
-        ... # TODO: DS team
+        results = cls._instance.model(img)
+        result = results[0]
+
+        detected_foods = []
+        for box in result.boxes:
+            bbox = box.xyxy[0].tolist()  # Bounding box coordinates (x1, y1, x2, y2)
+            conf = box.conf.item()
+            class_id = int(box.cls.item())
+            class_name = cls._instance.model.names[class_id]
+
+            food = ScannedFood(name=class_name, confidence=conf, bbox=bbox)
+            detected_foods.append(food)
+
+        if not detected_foods:
+            raise RuntimeError("No food items detected in the image.")
+
+        return detected_foods

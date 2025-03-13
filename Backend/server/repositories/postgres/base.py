@@ -7,9 +7,15 @@ T = TypeVar('T')
 
 
 class BaseRepository(ABC, Generic[T]):
-    def __init__(self, db: Session, model: type[T]) -> None:
-        self.db = db
+    def __init__(self, db: Session | None, model: type[T]) -> None:
+        self._db = db
         self.model = model
+        
+    @property
+    def db(self) -> Session:
+        if self._db is None:
+            raise RuntimeError('No database specified')
+        return self._db
 
     def close(self) -> None:
         self.db.close()
@@ -18,13 +24,16 @@ class BaseRepository(ABC, Generic[T]):
     def create(self, data: dict) -> T: ...
 
     @abstractmethod
-    def get_by_id(self, data: dict) -> T | None: ...
+    def get_all(self) -> list[T]: ...
 
     @abstractmethod
-    def get_all(self, data: dict) -> list[T]: ...
+    def get_by_id(self, obj_id: int) -> T | None: ...
 
     @abstractmethod
-    def update(self, data: dict) -> T | None: ...
-    
+    def update(self, obj_id: int, data: dict) -> T | None: ...
+
     @abstractmethod
-    def delete(self, data: dict) -> bool: ...
+    def filter_by(self, **filters) -> list[T]: ...
+
+    @abstractmethod
+    def delete(self, obj_id: int) -> bool: ...

@@ -9,7 +9,7 @@ class MockUserRepository(BaseUserRepository):
 
     def __init__(self) -> None:
         self.fake_db = []
-        super().__init__(None, UserModel)
+        super().__init__(UserModel)
 
     def create(self, data: dict) -> UserModel:
         Log.print_debug('New user created:', data)

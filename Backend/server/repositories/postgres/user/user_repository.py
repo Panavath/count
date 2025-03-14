@@ -1,12 +1,21 @@
-from models import UserModel
+import atexit
 
+from sqlalchemy.orm import Session
+
+from models import UserModel
 from database.database import SessionLocal
 from repositories.postgres.user.base_user import BaseUserRepository
 
 
 class UserRepository(BaseUserRepository):
     def __init__(self) -> None:
-        super().__init__(SessionLocal(), UserModel)
+        self._db = SessionLocal()
+        atexit.register(lambda: self._db.close())
+        super().__init__(UserModel)
+
+    @property
+    def db(self) -> Session:
+        return self._db
 
     def create(self, data: dict) -> UserModel:
         obj = self.model(data)

@@ -9,6 +9,7 @@ from repositories import *
 app = FastAPI()
 EdamamService.initialize(MockEdamamRepository())
 YoloService.initialize("yolov8n.pt")
+DatabaseService.initialize(user_db_repo=MockUserRepository())
 
 
 @app.get('/')

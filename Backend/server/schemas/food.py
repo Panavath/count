@@ -8,9 +8,5 @@ class BaseFood(BaseModel):
     amount: float
     unit: str
 
-
-class ScannedFood(BaseModel):
-    class_name: str
-    confidence: float
-    bbox: list
-    nutrition_info: Optional[EdamamNutritionInfo]
+class FoodWithInfo(BaseFood):
+    nutrition_info: EdamamNutritionInfo

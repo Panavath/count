@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
 from schemas.edamam import EdamamNutritionInfo
-from schemas.food import ScannedFood
+from schemas.yolo import BaseScannedFood
 
 class BaseEdamamRepository(ABC):
     @abstractmethod
-    def get_nutrition_info(self, scanned_food: ScannedFood) -> EdamamNutritionInfo:
+    def get_nutrition_info(self, scanned_food: BaseScannedFood) -> EdamamNutritionInfo:
         ...

@@ -6,7 +6,7 @@ from ultralytics import YOLO
 
 from repositories.edamam.base import BaseEdamamRepository
 from schemas.edamam import EdamamNutritionInfo
-from schemas.food import ScannedFood
+from schemas.yolo import BaseScannedFood
 from other.utils import Log
 
 
@@ -33,7 +33,7 @@ class EdamamService:
         cls._instance = instance
 
     @classmethod
-    def get_nutrition_info(cls, food: ScannedFood) -> EdamamNutritionInfo:
+    def get_nutrition_info(cls, food: BaseScannedFood) -> EdamamNutritionInfo:
         """
         Gets the nutrition information for the provided food or list of foods
 

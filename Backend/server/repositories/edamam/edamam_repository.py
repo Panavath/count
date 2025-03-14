@@ -3,7 +3,7 @@ from config import EDAMAM_API_KEY, EDAMAM_APP_ID
 
 from repositories.edamam.base import BaseEdamamRepository
 from schemas.edamam import EdamamNutritionInfo
-from schemas.food import ScannedFood
+from schemas.yolo import BaseScannedFood
 
 
 class EdamamRepository(BaseEdamamRepository):
@@ -19,7 +19,7 @@ class EdamamRepository(BaseEdamamRepository):
         self._api_key = EDAMAM_API_KEY
         self._app_id = EDAMAM_APP_ID
 
-    def get_nutrition_info(self, scanned_food: ScannedFood) -> EdamamNutritionInfo:
+    def get_nutrition_info(self, scanned_food: BaseScannedFood) -> EdamamNutritionInfo:
         params = {
             "ingr": scanned_food.class_name,
             "app_id": self._app_id,

@@ -5,6 +5,7 @@ from fastapi import File, UploadFile
 from pydantic import BaseModel
 
 from . import Router
+from schemas.yolo import ScannedFoodWithInfo
 from services import YoloService, EdamamService
 
 from other.utils import Path, list_model_to_dict
@@ -27,9 +28,11 @@ def log_food(food: test):
 @log_router.r.post('/scan/')
 def post_log_scan(file: UploadFile = File(...)):
     detected_foods = YoloService.analyze_image(file.file.read())
+    
+    foods: list[ScannedFoodWithInfo] = []
     for food in detected_foods:
         nutri = EdamamService.get_nutrition_info(food)
-        food.nutrition_info = nutri
+        foods.append(ScannedFoodWithInfo(**food.model_dump(), nutrition_info=nutri))
 
     Path.save_cache_json('test.json', list_model_to_dict("foods", detected_foods))
 

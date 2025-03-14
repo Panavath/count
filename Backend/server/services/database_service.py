@@ -21,12 +21,12 @@ class DatabaseService:
 
     @classmethod
     def initialize(
-        cls,
-        user_db: BaseUserRepository
+        cls, *,
+        user_db_repo: BaseUserRepository
     ) -> None:
         Log.print_debug(
-            'Database service initialized with db:', type(user_db).__name__
+            'Database service initialized with db:', type(user_db_repo).__name__
         )
         instance = DatabaseService()
-        instance._user_repository = user_db
+        instance._user_repository = user_db_repo
         cls._instance = instance

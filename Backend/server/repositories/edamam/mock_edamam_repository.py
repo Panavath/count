@@ -2,7 +2,7 @@ from requests import Session
 
 from repositories.edamam.base import BaseEdamamRepository
 from schemas.edamam import EdamamNutritionInfo
-from schemas.food import ScannedFood
+from schemas.yolo import BaseScannedFood
 
 
 class MockEdamamRepository(BaseEdamamRepository):
@@ -12,7 +12,7 @@ class MockEdamamRepository(BaseEdamamRepository):
         self._session = Session()
 
     def get_nutrition_info(
-        self, scanned_food: ScannedFood
+        self, scanned_food: BaseScannedFood
     ) -> EdamamNutritionInfo:
         """
         Returns a mock data

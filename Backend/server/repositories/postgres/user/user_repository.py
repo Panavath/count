@@ -17,8 +17,8 @@ class UserRepository(BaseUserRepository):
     def db(self) -> Session:
         return self._db
 
-    def create(self, data: dict) -> UserModel:
-        obj = self.model(data)
+    def create(self, **kwargs) -> UserModel:
+        obj = self.model(**kwargs)
         self.db.add(obj)
         self.db.commit()
         self.db.refresh(obj)
@@ -28,12 +28,12 @@ class UserRepository(BaseUserRepository):
         return self.db.query(self.model).all()
 
     def get_by_id(self, obj_id: int) -> UserModel | None:
-        return self.db.query(self.model).filter(self.model.id == obj_id).first()
+        return self.db.query(self.model).filter(self.model.user_id == obj_id).first()
 
-    def update(self, obj_id: int, data: dict) -> UserModel | None:
+    def update(self, obj_id: int, **kwargs) -> UserModel | None:
         obj = self.get_by_id(obj_id)
         if obj:
-            for key, value in data.items():
+            for key, value in kwargs.items():
                 setattr(obj, key, value)
             self.db.commit()
             self.db.refresh(obj)

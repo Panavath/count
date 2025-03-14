@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from repositories import BaseUserRepository
+from schemas.food_log import BaseFoodLog
 from other.utils import Log
 
 
@@ -25,8 +26,16 @@ class DatabaseService:
         user_db_repo: BaseUserRepository
     ) -> None:
         Log.print_debug(
-            'Database service initialized with db:', type(user_db_repo).__name__
+            'Database service initialized with db:',
+            type(user_db_repo).__name__
         )
         instance = DatabaseService()
         instance._user_repository = user_db_repo
         cls._instance = instance
+
+    @classmethod
+    def add_food_log(cls, user_id: int, food_log: BaseFoodLog) -> None:
+        Log.print_debug(
+            f'Added food log to user {user_id}:', food_log
+        )
+        # cls.get_instance().

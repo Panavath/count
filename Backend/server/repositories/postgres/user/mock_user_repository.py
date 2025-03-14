@@ -11,9 +11,9 @@ class MockUserRepository(BaseUserRepository):
         self.fake_db = []
         super().__init__(UserModel)
 
-    def create(self, data: dict) -> UserModel:
-        Log.print_debug('New user created:', data)
-        obj = self.model(data)
+    def create(self, **kwargs) -> UserModel:
+        Log.print_debug('New user created:', kwargs)
+        obj = self.model(**kwargs)
         self.fake_db.append(obj)
         return obj
 
@@ -23,7 +23,7 @@ class MockUserRepository(BaseUserRepository):
     def get_by_id(self, obj_id: int) -> UserModel | None:
         return self.fake_db[0]
 
-    def update(self, obj_id: int, data: dict) -> UserModel | None:
+    def update(self, obj_id: int, **kwargs) -> UserModel | None:
         obj = self.get_by_id(obj_id)
         return obj
 

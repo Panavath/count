@@ -1,16 +1,9 @@
 from datetime import datetime
-from enum import Enum
 
 from pydantic import BaseModel, Field
 
+from enums.enums import MealType
 from .food import FoodWithInfo
-
-class MealType(Enum):
-    breakfast = 'Breakfast'
-    lunch = 'Lunch'
-    dinner = 'Dinner'
-    snack = 'Snack'
-
 
 class BaseFoodLog(BaseModel):
     name: str

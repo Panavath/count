@@ -6,12 +6,10 @@ from pydantic import BaseModel
 
 from . import Router
 from schemas.yolo import ScannedFoodWithInfo
+from schemas.food_log import BaseFoodLog
 from services import YoloService, EdamamService
 
 from other.utils import Path, list_model_to_dict
-
-class test(BaseModel):
-    name: str
 
 log_router = Router(prefix='/log', tags=['log'])
 
@@ -21,14 +19,14 @@ def get_logs():
     return {'message': ''}
 
 @log_router.r.post('/food/')
-def log_food(food: test):
+def post_log_food(food: BaseFoodLog):
     return food
 
 
 @log_router.r.post('/scan/')
 def post_log_scan(file: UploadFile = File(...)):
     detected_foods = YoloService.analyze_image(file.file.read())
-    
+
     foods: list[ScannedFoodWithInfo] = []
     for food in detected_foods:
         nutri = EdamamService.get_nutrition_info(food)

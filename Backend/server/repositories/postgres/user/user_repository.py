@@ -1,13 +1,24 @@
+import atexit
+
+from sqlalchemy.orm import Session
+
 from models import UserModel
-from repositories.postgres.base import BaseRepository
 from database.database import SessionLocal
+from repositories.postgres.user.base_user import BaseUserRepository
 
-class UserRepository(BaseRepository[UserModel]):
+
+class UserRepository(BaseUserRepository):
     def __init__(self) -> None:
-        super().__init__(SessionLocal(), UserModel)
+        self._db = SessionLocal()
+        atexit.register(lambda: self._db.close())
+        super().__init__(UserModel)
 
-    def create(self, data: dict) -> UserModel:
-        obj = self.model(data)
+    @property
+    def db(self) -> Session:
+        return self._db
+
+    def create(self, **kwargs) -> UserModel:
+        obj = self.model(**kwargs)
         self.db.add(obj)
         self.db.commit()
         self.db.refresh(obj)
@@ -17,12 +28,12 @@ class UserRepository(BaseRepository[UserModel]):
         return self.db.query(self.model).all()
 
     def get_by_id(self, obj_id: int) -> UserModel | None:
-        return self.db.query(self.model).filter(self.model.id == obj_id).first()
+        return self.db.query(self.model).filter(self.model.user_id == obj_id).first()
 
-    def update(self,obj_id: int, data: dict) -> UserModel | None:
+    def update(self, obj_id: int, **kwargs) -> UserModel | None:
         obj = self.get_by_id(obj_id)
         if obj:
-            for key, value in data.items():
+            for key, value in kwargs.items():
                 setattr(obj, key, value)
             self.db.commit()
             self.db.refresh(obj)
@@ -31,7 +42,7 @@ class UserRepository(BaseRepository[UserModel]):
     def filter_by(self, **filters) -> list[UserModel]:
         return self.db.query(self.model).filter_by(**filters).all()
 
-    def delete(self, obj_id: int) -> bool: 
+    def delete(self, obj_id: int) -> bool:
         obj = self.get_by_id(obj_id)
         if obj:
             self.db.delete(obj)

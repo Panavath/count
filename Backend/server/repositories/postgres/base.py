@@ -1,39 +1,31 @@
 from abc import ABC, abstractmethod
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Sequence
 
-from sqlalchemy.orm import Session
+from pydantic import BaseModel
+from sqlalchemy.orm import DeclarativeBase
 
-T = TypeVar('T')
+ModelType = TypeVar("ModelType", bound=DeclarativeBase)
+SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
-class BaseRepository(ABC, Generic[T]):
-    def __init__(self, db: Session | None, model: type[T]) -> None:
-        self._db = db
+class BaseDBRepository(ABC, Generic[ModelType, SchemaType]):
+    def __init__(self, model: type[ModelType]) -> None:
         self.model = model
-        
-    @property
-    def db(self) -> Session:
-        if self._db is None:
-            raise RuntimeError('No database specified')
-        return self._db
-
-    def close(self) -> None:
-        self.db.close()
 
     @abstractmethod
-    def create(self, data: dict) -> T: ...
+    def create(self, **kwargs) -> ModelType: ...
 
     @abstractmethod
-    def get_all(self) -> list[T]: ...
+    def get_all(self) -> Sequence[ModelType]: ...
 
     @abstractmethod
-    def get_by_id(self, obj_id: int) -> T | None: ...
+    def get_by_id(self, obj_id: int) -> ModelType | None: ...
 
     @abstractmethod
-    def update(self, obj_id: int, data: dict) -> T | None: ...
+    def update(self, obj_id: int, **kwargs) -> ModelType | None: ...
 
     @abstractmethod
-    def filter_by(self, **filters) -> list[T]: ...
+    def filter_by(self, **filters) -> Sequence[ModelType]: ...
 
     @abstractmethod
     def delete(self, obj_id: int) -> bool: ...

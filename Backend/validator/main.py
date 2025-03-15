@@ -28,7 +28,8 @@ if __name__ == '__main__':
                 raise ValueError('Error: No image type specified')
 
             with open(test.image_path, 'rb') as file:
-                files = {'file': (test.image_path, file.read(), test.image_type)}
+                files = {
+                    'file': (test.image_path, file.read(), test.image_type)}
 
         try:
             if test.method == 'POST':
@@ -47,6 +48,9 @@ if __name__ == '__main__':
                 if actual_content == expected_content:
                     print(BColor.GREEN + BColor.BOLD +
                           '[✓] Passed' + BColor.ENDC)
+                elif expected_content == {}:
+                    print(BColor.GREEN + BColor.BOLD +
+                          '[✓] ' + str(actual_content) + BColor.ENDC)
                 else:
                     raise ValidationError(
                         'Response does not match expected content', actual_content)

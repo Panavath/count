@@ -3,7 +3,7 @@ from config import EDAMAM_API_KEY, EDAMAM_APP_ID
 
 from repositories.edamam.base import BaseEdamamRepository
 from schemas.edamam import EdamamNutritionInfo
-from schemas.food import ScannedFood
+from schemas.yolo import BaseScannedFood
 
 
 class EdamamRepository(BaseEdamamRepository):
@@ -19,9 +19,9 @@ class EdamamRepository(BaseEdamamRepository):
         self._api_key = EDAMAM_API_KEY
         self._app_id = EDAMAM_APP_ID
 
-    def get_nutrition_info(self, scanned_food: ScannedFood) -> list[EdamamNutritionInfo]:
+    def get_nutrition_info(self, scanned_food: BaseScannedFood) -> EdamamNutritionInfo:
         params = {
-            "ingr": scanned_food.name, 
+            "ingr": scanned_food.class_name,
             "app_id": self._app_id,
             "app_key": self._api_key,
             "nutrition-type": "cooking"
@@ -33,11 +33,11 @@ class EdamamRepository(BaseEdamamRepository):
         )
 
         if response.status_code != 200:
-            raise RuntimeError(f"Request failed for '{scanned_food.name}' with status code {response.status_code}")
+            raise RuntimeError(f"Request failed for '{scanned_food.class_name}' with status code {response.status_code}")
 
         data = response.json()
         if "hints" not in data or not data["hints"]:
-            raise RuntimeError(f"No food items found for '{scanned_food.name}'.")
+            raise RuntimeError(f"No food items found for '{scanned_food.class_name}'.")
 
         food_data = data["hints"][0]["food"]
         label = food_data.get("label", "Unknown")

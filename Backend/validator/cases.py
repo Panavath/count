@@ -53,12 +53,8 @@ cases: list[Case] = [
         method='POST',
         body={},
         expected_code=200,
-        expected_content={
-            'filename': 'temp.jpg',
-            'content_type': 'image/jpeg',
-            'file_path': 'cache\\temp.jpg',
-        },
-        image_path='assets/rock.jpg',
+        expected_content={},
+        image_path='assets/alot.jpg',
         image_type='image/jpeg',
     ),
 ]

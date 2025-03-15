@@ -7,9 +7,8 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from database.database import BaseModel
 from enums.enums import MealType
 
-if TYPE_CHECKING:
-    from .user import UserModel
-    from .food import FoodModel
+from .user import UserModel
+from .food import FoodModel
 
 
 class FoodLogModel(BaseModel):

@@ -25,6 +25,10 @@ class DatabaseService:
     def user_repository(self) -> BaseUserRepository:
         return self._user_repository
 
+    @property
+    def log_repository(self) -> BaseFoodLogRepository:
+        return self._log_repository
+
     @classmethod
     def initialize(
         cls, *,
@@ -50,3 +54,7 @@ class DatabaseService:
     @classmethod
     def get_user_by_id(cls, user_id: int) -> Row[tuple[UserModel]] | None:
         return cls.get_instance().user_repository.get_by_id(user_id)
+
+    @classmethod
+    def get_log_of_user(cls, user_id: int):
+        return cls.get_instance().log_repository.get_by_user_id(user_id)

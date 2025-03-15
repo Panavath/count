@@ -24,12 +24,27 @@ def post_log_food(food: BaseFoodLog, user_id: int = Query(...)):
     Log.print_debug(user_id)
     Log.print_debug(food)
     user = DatabaseService.get_user_by_id(user_id)
-    
+
     if user is None:
         return HTTPException(404, "User not found plz register.")
-    
+
     new_log = DatabaseService.add_food_log(user_id, food)
     return new_log
+
+@log_router.r.get('/food/')
+def get_log_food(user_id: int = Query(...)):
+    Log.print_debug(user_id)
+    user = DatabaseService.get_user_by_id(user_id)
+
+    if user is None:
+        return HTTPException(404, "User not found plz register.")
+
+    logs = DatabaseService.get_log_of_user(user_id)
+
+    if logs is None:
+        return {'logs': []}
+    print(logs)
+    return {'logs': logs[0]._data}
 
 
 @log_router.r.post('/scan/')

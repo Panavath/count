@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Sequence, Any
+
+from sqlalchemy import Row
 from enums.enums import MealType
 from models import FoodLogModel
 from repositories.postgres.base import BaseDBRepository
@@ -22,10 +24,17 @@ class BaseFoodLogRepository(BaseDBRepository[FoodLogModel, BaseFoodLog], ABC):
     def get_all(self) -> Sequence[FoodLogModel]: ...
 
     @abstractmethod
-    def get_by_id(self, obj_id: int) -> FoodLogModel | None: ...
+    def get_by_user_id(
+        self,
+        user_id: int,
+    ) -> Sequence[Row[tuple[FoodLogModel]]] | None: ...
 
     @abstractmethod
-    def update(self, obj_id: int, **kwargs) -> FoodLogModel | None: ...
+    def update(
+        self,
+        obj_id: int,
+        **kwargs
+    ) -> Row[tuple[FoodLogModel]] | None: ...
 
     @abstractmethod
     def filter_by(self, **filters) -> Sequence[FoodLogModel]: ...

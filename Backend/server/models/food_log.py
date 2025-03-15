@@ -7,8 +7,9 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from database.database import BaseModel
 from enums.enums import MealType
 
-from .user import UserModel
-from .food import FoodModel
+if TYPE_CHECKING:
+    from .user import UserModel
+    from .food import FoodModel
 
 
 class FoodLogModel(BaseModel):
@@ -26,5 +27,5 @@ class FoodLogModel(BaseModel):
     date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
 
     # Relationships
-    user: Mapped[UserModel] = relationship('UserModel', back_populates='food_logs')
-    food: Mapped[FoodModel] = relationship('FoodModel')
+    user: Mapped['UserModel'] = relationship('UserModel', back_populates='food_logs')
+    foods: Mapped['FoodModel'] = relationship('FoodModel')

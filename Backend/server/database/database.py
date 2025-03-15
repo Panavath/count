@@ -9,3 +9,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class BaseModel(DeclarativeBase):
     ...
+
+
+def create_tables():
+    BaseModel.metadata.create_all(engine)

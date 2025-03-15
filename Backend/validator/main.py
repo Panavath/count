@@ -56,7 +56,7 @@ if __name__ == '__main__':
                         'Response does not match expected content', actual_content)
             else:
                 raise ValidationError(
-                    'Unexpected status code: ' + str(response.status_code)
+                    'Unexpected status code: ' + str(response.status_code) + str(response.content.decode())
                 )
         except requests.exceptions.RequestException as e:
             print_error(f'Request failed: {str(e)}')

@@ -1,5 +1,6 @@
 import atexit
 
+from sqlalchemy import Row, select
 from sqlalchemy.orm import Session
 
 from models import UserModel
@@ -27,10 +28,11 @@ class UserRepository(BaseUserRepository):
     def get_all(self) -> list[UserModel]:
         return self.db.query(self.model).all()
 
-    def get_by_id(self, obj_id: int) -> UserModel | None:
-        return self.db.query(self.model).filter(self.model.user_id == obj_id).first()
+    def get_by_id(self, obj_id: int) -> Row[tuple[UserModel]] | None:
+        stmt = select(self.model).where(self.model.user_id == obj_id)
+        return self.db.execute(stmt).first()
 
-    def update(self, obj_id: int, **kwargs) -> UserModel | None:
+    def update(self, obj_id: int, **kwargs) -> Row[tuple[UserModel]] | None:
         obj = self.get_by_id(obj_id)
         if obj:
             for key, value in kwargs.items():

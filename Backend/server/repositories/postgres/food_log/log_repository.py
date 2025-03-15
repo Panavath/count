@@ -25,9 +25,9 @@ class LogRepository(BaseFoodLogRepository):
             new_entry = FoodLogModel(
                 user_id=user_id,
                 meal_type=meal_type,
-                time=time,
-                foods=foods,
-                **kwargs
+                date=time.isoformat(),
+                # foods=foods,
+                # **kwargs
             )
 
             self._db.add(new_entry)
@@ -39,7 +39,7 @@ class LogRepository(BaseFoodLogRepository):
 
         except Exception as e:
             self._db.rollback()
-            raise RuntimeError
+            raise e
 
     def get_all(self) -> list[FoodLogModel]:
         return self.db.query(self.model).all()

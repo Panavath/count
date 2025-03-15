@@ -1,0 +1,62 @@
+{
+    "status": "success",
+    "message": "Food plate analysis completed successfully",
+    "result": {
+        "foods_identified": [
+            {
+                "name": "Hamburger",
+                "portion_size": "1 unit",
+                "calories": "250-500 calories (depending on size and ingredients)",
+                "protein": "12-25 grams",
+                "carbs": "20-45 grams",
+                "fats": "10-30 grams"
+            }
+        ],
+        "total_nutrition": {
+            "total_calories": "250-500 calories",
+            "total_protein": "12-25 grams",
+            "total_carbs": "20-45 grams",
+            "total_fats": "10-30 grams",
+            "fiber": "1-3 grams",
+            "vitamins_minerals": [
+                "Calcium",
+                "Iron",
+                "Vitamin B12"
+            ]
+        },
+        "meal_analysis": {
+            "meal_type": "lunch",
+            "balance_score": "6 out of 10",
+            "protein_ratio": "20%",
+            "carb_ratio": "35%",
+            "fat_ratio": "45%"
+        },
+        "health_insights": {
+            "meal_balance": "Moderately balanced but can be high in fats and carbs.",
+            "positive_aspects": [
+                "Good source of protein",
+                "Provides quick energy"
+            ],
+            "improvement_areas": [
+                "High in saturated fats",
+                "May contain added sugars"
+            ],
+            "suggestions": [
+                "Add a side of vegetables",
+                "Choose a leaner meat option"
+            ]
+        },
+        "dietary_flags": {
+            "is_vegetarian": false,
+            "is_vegan": false,
+            "is_gluten_free": false,
+            "is_dairy_free": false,
+            "allergens": [
+                "Wheat",
+                "Soy",
+                "Dairy"
+            ]
+        }
+    },
+    "cacheTime": 1741884937342
+}

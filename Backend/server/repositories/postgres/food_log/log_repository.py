@@ -2,10 +2,12 @@ import atexit
 from datetime import datetime
 from typing import Any
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from enums.enums import MealType
 from models import FoodLogModel
+from schemas.food_log import BaseFoodLog
 from database.database import SessionLocal
 from repositories.postgres.food_log.base_log import BaseFoodLogRepository
 
@@ -25,9 +27,9 @@ class LogRepository(BaseFoodLogRepository):
             new_entry = FoodLogModel(
                 user_id=user_id,
                 meal_type=meal_type,
-                time=time,
-                foods=foods,
-                **kwargs
+                date=time.isoformat(),
+                # foods=foods,
+                # **kwargs
             )
 
             self._db.add(new_entry)
@@ -39,15 +41,20 @@ class LogRepository(BaseFoodLogRepository):
 
         except Exception as e:
             self._db.rollback()
-            raise RuntimeError
+            raise e
 
     def get_all(self) -> list[FoodLogModel]:
         return self.db.query(self.model).all()
 
-    def get_by_id(self, obj_id: int) -> FoodLogModel | None:
-        return self.db.query(self.model).filter(self.model.user_id == obj_id).first()
+    def get_by_user_id(self, user_id: int):
+        stmt = select(self.model).where(self.model.user_id == user_id)
+        return self.db.execute(stmt).all()
 
-    def update(self, obj_id: int, **kwargs) -> FoodLogModel | None:
+    def get_by_id(self, obj_id: int):
+        stmt = select(self.model).where(self.model.food_log_id == obj_id)
+        return self.db.execute(stmt).first()
+
+    def update(self, obj_id: int, **kwargs):
         obj = self.get_by_id(obj_id)
         if obj:
             for key, value in kwargs.items():

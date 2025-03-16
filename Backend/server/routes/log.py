@@ -1,15 +1,15 @@
 from os import path
 import shutil
 
-from fastapi import File, UploadFile
+from fastapi import File, Query, UploadFile, HTTPException
 from pydantic import BaseModel
 
 from . import Router
 from schemas.yolo import ScannedFoodWithInfo
 from schemas.food_log import BaseFoodLog
-from services import YoloService, EdamamService
+from services import YoloService, EdamamService, DatabaseService
 
-from other.utils import Path, list_model_to_dict
+from other.utils import Log, Path, list_model_to_dict
 
 log_router = Router(prefix='/log', tags=['log'])
 
@@ -18,9 +18,33 @@ log_router = Router(prefix='/log', tags=['log'])
 def get_logs():
     return {'message': ''}
 
+
 @log_router.r.post('/food/')
-def post_log_food(food: BaseFoodLog):
-    return food
+def post_log_food(food: BaseFoodLog, user_id: int = Query(...)):
+    Log.print_debug(user_id)
+    Log.print_debug(food)
+    user = DatabaseService.get_user_by_id(user_id)
+
+    if user is None:
+        return HTTPException(404, "User not found plz register.")
+
+    new_log = DatabaseService.add_food_log(user_id, food)
+    return new_log
+
+@log_router.r.get('/food/')
+def get_log_food(user_id: int = Query(...)):
+    Log.print_debug(user_id)
+    user = DatabaseService.get_user_by_id(user_id)
+
+    if user is None:
+        return HTTPException(404, "User not found plz register.")
+
+    logs = DatabaseService.get_log_of_user(user_id)
+
+    if logs is None:
+        return {'logs': []}
+    print(logs)
+    return {'logs': logs[0]._data}
 
 
 @log_router.r.post('/scan/')

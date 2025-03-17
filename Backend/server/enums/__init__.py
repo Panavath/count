@@ -1,5 +1,12 @@
 from enum import Enum
 
+__all__ = [
+    'MealType',
+    # 'WeightGoals',
+    # 'MuscleGoals',
+    # 'ExerciseType',
+]
+
 class WeightGoals(Enum):
     lose_weight = 'Lose Weight'
     gain_weight = 'Gain Weight'

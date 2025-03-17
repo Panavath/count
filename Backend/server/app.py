@@ -6,7 +6,7 @@ from routes import load_routes
 from services import *
 from repositories import *
 from database.database import create_tables
-from seeds import seed_all
+from database import seed_all
 
 app = FastAPI()
 EdamamService.initialize(MockEdamamRepository())

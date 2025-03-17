@@ -12,9 +12,10 @@ engine = create_engine(DB_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-class BaseModel(DeclarativeBase):
+
+class BaseTable(DeclarativeBase):
     ...
 
 
 def create_tables():
-    BaseModel.metadata.create_all(engine)
+    BaseTable.metadata.create_all(engine)

@@ -1,13 +1,11 @@
+from __future__ import annotations
+
 from enum import Enum
 from fastapi import APIRouter
 
 
-class Router:
-    router: APIRouter
-
-    @property
-    def r(self):
-        return self.router
+class CountRouter(APIRouter):
+    _routers: list[CountRouter] = []
 
     def __init__(
         self,
@@ -16,7 +14,5 @@ class Router:
         tags: list[str | Enum] | None = None,
         **kwargs,
     ) -> None:
-        self.router = APIRouter(prefix=prefix, tags=tags, **kwargs)
-        Router._routers.append(self.router)
-
-    _routers = []
+        CountRouter._routers.append(self)
+        super().__init__(prefix=prefix, tags=tags, **kwargs)

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from sqlalchemy import Row
 
-from models.food_log import FoodLogModel
-from models.user import UserModel
+from tables import FoodLogTable
+from tables import UserTable
 from repositories import BaseUserRepository, BaseFoodLogRepository
-from schemas.food_log import BaseFoodLog
+from schemas.food_log import BaseFoodLogSchema
 from other.utils import Log
 
 
@@ -45,14 +45,14 @@ class DatabaseService:
         cls._instance = instance
 
     @classmethod
-    def add_food_log(cls, user_id: int, food_log: BaseFoodLog) -> FoodLogModel:
+    def add_food_log(cls, user_id: int, food_log: BaseFoodLogSchema) -> FoodLogTable:
         Log.print_debug(
             f'Added food log to user {user_id}:', food_log
         )
         return cls.get_instance()._log_repository.create(user_id=user_id, **food_log.model_dump())
 
     @classmethod
-    def get_user_by_id(cls, user_id: int) -> Row[tuple[UserModel]] | None:
+    def get_user_by_id(cls, user_id: int) -> Row[tuple[UserTable]] | None:
         return cls.get_instance().user_repository.get_by_id(user_id)
 
     @classmethod

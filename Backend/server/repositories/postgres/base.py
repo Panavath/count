@@ -2,10 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Sequence
 
 from pydantic import BaseModel
-from sqlalchemy import Row
 from sqlalchemy.orm import DeclarativeBase
-
-from database.database import engine
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 SchemaType = TypeVar("SchemaType", bound=BaseModel)
@@ -16,19 +13,16 @@ class BaseDBRepository(ABC, Generic[ModelType, SchemaType]):
         self.model = model
 
     @abstractmethod
-    def create(self, **kwargs) -> ModelType: ...
+    def create(self, **kwargs) -> SchemaType: ...
 
     @abstractmethod
-    def get_all(self) -> Sequence[ModelType]: ...
+    def get_all(self) -> Sequence[SchemaType]: ...
 
     @abstractmethod
-    def get_by_id(self, obj_id: int) -> Row[tuple[ModelType]] | None: ...
+    def get_by_id(self, obj_id: int) -> SchemaType | None: ...
 
     @abstractmethod
-    def update(self, obj_id: int, **kwargs) -> Row[tuple[ModelType]] | None: ...
-
-    @abstractmethod
-    def filter_by(self, **filters) -> Sequence[ModelType]: ...
+    def update(self, obj_id: int, **kwargs) -> SchemaType | None: ...
 
     @abstractmethod
     def delete(self, obj_id: int) -> bool: ...

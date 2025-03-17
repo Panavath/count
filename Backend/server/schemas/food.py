@@ -1,12 +1,15 @@
 from typing import Optional, Any
 
 from pydantic import BaseModel
-from .edamam import EdamamNutritionInfo
+from .edamam import EdamamNutritionInfoSchema
 
-class BaseFood(BaseModel):
+class BaseFoodSchema(BaseModel):
     name: str
-    amount: float
+    serving_size: float
     unit: str
 
-class FoodWithInfo(BaseFood):
-    nutrition_info: EdamamNutritionInfo
+class FoodWithInfoSchema(BaseFoodSchema):
+    calories: float
+    protein_g: float
+    carbs_g: float
+    fat_g: float

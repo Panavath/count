@@ -1,9 +1,9 @@
-from schemas.food_log import BaseFoodLog
+from schemas.food_log import BaseFoodLogSchema
 
 
-food = BaseFoodLog(
-    class_name='asdasd', 
-    meal_type='Breakfast', 
-    time='time', 
+food = BaseFoodLogSchema(
+    class_name='asdasd',
+    meal_type='Breakfast',
+    time='time',
     foods=[],
 )

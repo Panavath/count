@@ -2,11 +2,11 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from enums.enums import MealType
-from .food import FoodWithInfo
+from enums import MealType
+from .food import FoodWithInfoSchema
 
-class BaseFoodLog(BaseModel):
+class BaseFoodLogSchema(BaseModel):
     name: str
     meal_type: MealType
     time: datetime
-    foods: list[FoodWithInfo]
+    foods: list[FoodWithInfoSchema]

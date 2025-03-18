@@ -15,7 +15,7 @@ DatabaseService.initialize(user_db_repo=UserRepository(), food_log_repo=LogRepos
 
 
 @app.get('/')
-def root():
+async def root():
     return {'message': 'Hello World!'}
 
 

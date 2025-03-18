@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from enum import Enum
-from fastapi import APIRouter
 
+from fastapi import APIRouter
 
 class CountRouter(APIRouter):
     _routers: list[CountRouter] = []

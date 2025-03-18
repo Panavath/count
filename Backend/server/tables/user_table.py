@@ -19,7 +19,8 @@ class UserTable(BaseTable):
     __tablename__ = 'User'
 
     # Columns
-    user_id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        primary_key=True, index=True, autoincrement=True)
     username: Mapped[str] = mapped_column(nullable=False)
 
     # Relationships
@@ -29,22 +30,9 @@ class UserTable(BaseTable):
     def __init__(
             self, *,
             user_name: str,
-            food_logs: list['FoodLogTable'] | None = None,
-
-            meal_type: MealType,
-            date: datetime,
-            foods: list['FoodTable'],
-
-            name: str,
-            serving_size: float,
-            unit: str,
-            values_calculated: bool,
-            calories: float = 0,
-            protein_g: float = 0,
-            carbs_g: float = 0,
-            fat_g: float = 0,
+            food_logs: list['FoodLogTable'],
             **kwargs):
-        super().__init__(user_name=user_name, **kwargs)
+        super().__init__(user_name=user_name, food_logs=food_logs, **kwargs)
 
         if food_logs is None:
             food_logs = []

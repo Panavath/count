@@ -1,8 +1,4 @@
-from os import path
-import shutil
-
 from fastapi import File, Query, UploadFile, HTTPException
-from pydantic import BaseModel
 
 from . import CountRouter
 from schemas.yolo import ScannedFoodWithInfoSchema
@@ -15,12 +11,12 @@ log_router = CountRouter(prefix='/log', tags=['log'])
 
 
 @log_router.get('')
-def get_logs():
+async def get_logs():
     return {'message': ''}
 
 
 @log_router.post('/food/')
-def post_log_food(food: BaseFoodLogSchema, user_id: int = Query(...)):
+async def post_log_food(food: BaseFoodLogSchema, user_id: int = Query(...)):
     Log.print_debug(user_id)
     Log.print_debug(food)
     user = DatabaseService.get_user_by_id(user_id)
@@ -32,7 +28,7 @@ def post_log_food(food: BaseFoodLogSchema, user_id: int = Query(...)):
     return new_log
 
 @log_router.get('/food/')
-def get_log_food(user_id: int = Query(...)):
+async def get_log_food(user_id: int = Query(...)):
     Log.print_debug(user_id)
     user = DatabaseService.get_user_by_id(user_id)
 
@@ -48,7 +44,7 @@ def get_log_food(user_id: int = Query(...)):
 
 
 @log_router.post('/scan/')
-def post_log_scan(file: UploadFile = File(...)):
+async def post_log_scan(file: UploadFile = File(...)):
     detected_foods = YoloService.analyze_image(file.file.read())
 
     foods: list[ScannedFoodWithInfoSchema] = []

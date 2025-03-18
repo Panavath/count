@@ -1,11 +1,10 @@
 import os
-import sys
 from importlib import import_module
-from enum import Enum
 
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 
 from routes.__router__ import CountRouter
+
 
 def load_routes(app: FastAPI) -> None:
     for file in os.listdir(__package__):

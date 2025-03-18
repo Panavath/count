@@ -47,6 +47,6 @@ class EdamamRepository(BaseEdamamRepository):
             description=label,
             calories=nutrients.get("ENERC_KCAL", "N/A"),
             protein_g=nutrients.get("PROCNT", "N/A"),
+            carbs_g=nutrients.get("CHOCDF", "N/A"),
             fat_g=nutrients.get("FAT", "N/A"),
-            carbs_g=nutrients.get("CHOCDF", "N/A")
         )

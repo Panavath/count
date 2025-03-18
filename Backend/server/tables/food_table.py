@@ -33,7 +33,6 @@ class FoodTable(BaseTable):
 
     def __init__(
             self, *,
-            food_log_id: int,
             name: str,
             serving_size: float,
             unit: str,
@@ -45,7 +44,7 @@ class FoodTable(BaseTable):
             **kwargs,
     ):
         super().__init__(
-            food_log_id=food_log_id, name=name, serving_size=serving_size, unit=unit, values_calculated=values_calculated,
+            name=name, serving_size=serving_size, unit=unit, values_calculated=values_calculated,
             calories=calories, protein_g=protein_g, carbs_g=carbs_g, fat_g=fat_g, **kwargs
         )
 

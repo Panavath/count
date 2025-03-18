@@ -9,8 +9,8 @@ SchemaType = TypeVar("SchemaType", bound=BaseModel)
 
 
 class BaseDBRepository(ABC, Generic[ModelType, SchemaType]):
-    def __init__(self, model: type[ModelType]) -> None:
-        self.model = model
+    def __init__(self, table: type[ModelType]) -> None:
+        self.model = table
 
     @abstractmethod
     def create(self, **kwargs) -> SchemaType: ...

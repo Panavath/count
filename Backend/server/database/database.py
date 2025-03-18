@@ -19,3 +19,7 @@ class BaseTable(DeclarativeBase):
 
 def create_tables():
     BaseTable.metadata.create_all(engine)
+
+
+def drop_all_tables():
+    BaseTable.metadata.drop_all(engine)

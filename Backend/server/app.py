@@ -10,7 +10,7 @@ from database import seed_all
 
 app = FastAPI()
 EdamamService.initialize(MockEdamamRepository())
-YoloService.initialize("yolov8n.pt")
+YoloService.initialize("UECFood256.pt")
 DatabaseService.initialize(user_db_repo=UserRepository(), food_log_repo=LogRepository())
 
 

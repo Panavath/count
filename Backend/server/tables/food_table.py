@@ -21,7 +21,7 @@ class FoodTable(BaseTable):
     serving_size: Mapped[float] = mapped_column(nullable=False)
     unit: Mapped[str] = mapped_column(nullable=False)
 
-    value_calculated: Mapped[bool] = mapped_column(default=False)
+    values_calculated: Mapped[bool] = mapped_column(default=False)
     calories: Mapped[float] = mapped_column(default=0.0)
     protein_g: Mapped[float] = mapped_column(default=0.0)
     carbs_g: Mapped[float] = mapped_column(default=0.0)
@@ -29,7 +29,7 @@ class FoodTable(BaseTable):
 
     # Relationships
     food_log: Mapped['FoodLogTable'] = relationship(
-        'FoodTable', uselist=True, back_populates='foods')
+        'FoodLogTable', uselist=False, back_populates='foods')
 
     def __init__(
             self, *,

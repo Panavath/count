@@ -4,15 +4,15 @@ from sqlalchemy import Row
 
 from tables import FoodLogTable
 from tables import UserTable
-from repositories import BaseUserRepository, BaseFoodLogRepository
-from schemas.food_log import BaseFoodLogSchema
+from repositories import BaseDBRepository
+from schemas import *
 from other.utils import Log
+from dto import FoodDTO
 
 
 class DatabaseService:
     _instance: DatabaseService | None = None
-    _user_repository: BaseUserRepository
-    _log_repository: BaseFoodLogRepository
+    _db_repository: BaseDBRepository
 
     @classmethod
     def get_instance(cls) -> DatabaseService:
@@ -22,39 +22,36 @@ class DatabaseService:
         return cls._instance
 
     @property
-    def user_repository(self) -> BaseUserRepository:
-        return self._user_repository
-
-    @property
-    def log_repository(self) -> BaseFoodLogRepository:
-        return self._log_repository
+    def db_repo(self) -> BaseDBRepository:
+        return self._db_repository
 
     @classmethod
     def initialize(
         cls, *,
-        user_db_repo: BaseUserRepository,
-        food_log_repo: BaseFoodLogRepository
+        db_repo: BaseDBRepository,
     ) -> None:
         Log.print_debug(
             'Database service initialized with db:',
-            type(user_db_repo).__name__
+            type(db_repo).__name__
         )
         instance = DatabaseService()
-        instance._user_repository = user_db_repo
-        instance._log_repository = food_log_repo
+        instance._db_repository = db_repo
         cls._instance = instance
 
     @classmethod
-    def add_food_log(cls, user_id: int, food_log: BaseFoodLogSchema) -> FoodLogTable:
+    def new_user(cls, user_name: str) -> UserSchema:
+        return cls.get_instance().db_repo.create_user(user_name)
+
+    @classmethod
+    def add_food_log(cls, user_id: int, food_log: FoodLogSchema) -> UserSchema:
         Log.print_debug(
             f'Added food log to user {user_id}:', food_log
         )
-        return cls.get_instance()._log_repository.create(user_id=user_id, **food_log.model_dump())
+        return cls.get_instance().db_repo.add_food_log(user_id=user_id, log_name=food_log.name, meal_type=food_log.meal_type, date=food_log.date, foods=food_log.foods)
 
     @classmethod
-    def get_user_by_id(cls, user_id: int) -> Row[tuple[UserTable]] | None:
-        return cls.get_instance().user_repository.get_by_id(user_id)
-
+    def get_user_by_id(cls, user_id: int) -> UserSchema:
+        return cls.get_instance().db_repo.get_user_schema_by_id(user_id)
     @classmethod
-    def get_log_of_user(cls, user_id: int):
-        return cls.get_instance().log_repository.get_by_user_id(user_id)
+    def get_all_users(cls) -> list[UserSchema]:
+        return cls.get_instance().db_repo.get_all_users()

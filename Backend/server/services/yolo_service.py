@@ -6,6 +6,7 @@ import numpy as np
 
 from schemas.yolo import BaseScannedFoodSchema, ScannedFoodWithInfoSchema
 from other.utils import Path, Log
+from other.exceptions import NoFoodDetectedException
 
 class YoloService:
     _instance: YoloService | None = None
@@ -57,6 +58,6 @@ class YoloService:
                 detected_foods.append(food)
 
             if not detected_foods:
-                raise RuntimeError("No food items detected in the image.")
+                raise NoFoodDetectedException("No food items detected in the image.")
 
         return detected_foods

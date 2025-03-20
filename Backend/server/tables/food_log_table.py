@@ -21,6 +21,7 @@ class FoodLogTable(BaseTable):
     food_log_id: Mapped[int] = mapped_column(
         primary_key=True, index=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('User.user_id'))
+    name: Mapped[str]
     meal_type: Mapped[MealType]
     date: Mapped[datetime]
 
@@ -32,12 +33,13 @@ class FoodLogTable(BaseTable):
 
     def __init__(
             self, *,
+            name: str,
             meal_type: MealType,
             date: datetime,
             foods: list[FoodTable],
             **kwargs
     ):
-        super().__init__(meal_type=meal_type, date=date, foods=foods, **kwargs)
+        super().__init__(name=name, meal_type=meal_type, date=date, foods=foods, **kwargs)
 
     def __repr__(self) -> str:
         return f'FoodLog({self.meal_type}, date={self.date}, foods={self.foods})'

@@ -1,14 +1,14 @@
 from typing import Optional, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from .edamam import EdamamNutritionInfoSchema
 
-class BaseFoodSchema(BaseModel):
+class FoodSchema(BaseModel):
+    food_id: Optional[int] = Field(None)
     name: str
     serving_size: float
     unit: str
 
-class FoodWithInfoSchema(BaseFoodSchema):
     calories: float
     protein_g: float
     carbs_g: float

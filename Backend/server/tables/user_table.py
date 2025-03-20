@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from database import BaseTable
 from enums import MealType
-from schemas import BaseUserSchema
+from schemas import UserSchema
 
 if TYPE_CHECKING:
     from tables import FoodTable
@@ -21,7 +21,7 @@ class UserTable(BaseTable):
     # Columns
     user_id: Mapped[int] = mapped_column(
         primary_key=True, index=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(nullable=False)
+    user_name: Mapped[str] = mapped_column(nullable=False)
 
     # Relationships
     food_logs: Mapped[list['FoodLogTable']] = relationship(
@@ -39,4 +39,4 @@ class UserTable(BaseTable):
         self.food_logs = food_logs
 
     def __repr__(self) -> str:
-        return f'User({self.username}, id={self.user_id}, food logs={self.food_logs})'
+        return f'User({self.user_name}, id={self.user_id}, food logs={self.food_logs})'

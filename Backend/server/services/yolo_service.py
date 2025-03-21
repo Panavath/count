@@ -4,8 +4,9 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 
-from schemas.yolo import BaseScannedFood, ScannedFoodWithInfo
+from schemas.yolo import BaseScannedFoodSchema, ScannedFoodWithInfoSchema
 from other.utils import Path, Log
+from other.exceptions import NoFoodDetectedException
 
 class YoloService:
     _instance: YoloService | None = None
@@ -26,7 +27,7 @@ class YoloService:
         cls._instance = instance
 
     @classmethod
-    def analyze_image(cls, file_content: bytes) -> list[BaseScannedFood]:
+    def analyze_image(cls, file_content: bytes) -> list[BaseScannedFoodSchema]:
         """
         Analyze the file content for foods.
 
@@ -53,10 +54,10 @@ class YoloService:
                 class_id = int(box.cls.item())
                 class_name = cls.get_instance().model.names[class_id]
 
-                food = BaseScannedFood(class_name=class_name, confidence=conf, bbox=bbox)
+                food = BaseScannedFoodSchema(class_name=class_name, confidence=conf, bbox=bbox)
                 detected_foods.append(food)
 
             if not detected_foods:
-                raise RuntimeError("No food items detected in the image.")
+                raise NoFoodDetectedException("No food items detected in the image.")
 
         return detected_foods

@@ -3,8 +3,9 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from .food_log import BaseFoodLog
+from .food_log import FoodLogSchema
 
-class BaseUser(BaseModel):
-    username: str
-    food_logs: list[BaseFoodLog]
+class UserSchema(BaseModel):
+    user_id: Optional[int]
+    user_name: str
+    food_logs: list[FoodLogSchema]

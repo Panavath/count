@@ -1,12 +1,19 @@
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from enums.enums import MealType
-from .food import FoodWithInfo
+from enums import MealType
+from .food import FoodSchema
 
-class BaseFoodLog(BaseModel):
+
+class FoodLogSchema(BaseModel):
+    food_log_id: int
     name: str
     meal_type: MealType
-    time: datetime
-    foods: list[FoodWithInfo]
+    date: datetime
+    foods: list[FoodSchema]
+
+
+class FoodLogCreationSchema(FoodLogSchema):
+    food_log_id: int | None = None

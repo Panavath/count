@@ -2,8 +2,8 @@ from requests import Session
 from config import EDAMAM_API_KEY, EDAMAM_APP_ID
 
 from repositories.edamam.base import BaseEdamamRepository
-from schemas.edamam import EdamamNutritionInfo
-from schemas.yolo import BaseScannedFood
+from schemas.edamam import EdamamNutritionInfoSchema
+from schemas.yolo import BaseScannedFoodSchema
 
 
 class EdamamRepository(BaseEdamamRepository):
@@ -19,7 +19,7 @@ class EdamamRepository(BaseEdamamRepository):
         self._api_key = EDAMAM_API_KEY
         self._app_id = EDAMAM_APP_ID
 
-    def get_nutrition_info(self, scanned_food: BaseScannedFood) -> EdamamNutritionInfo:
+    def get_nutrition_info(self, scanned_food: BaseScannedFoodSchema) -> EdamamNutritionInfoSchema:
         params = {
             "ingr": scanned_food.class_name,
             "app_id": self._app_id,
@@ -43,10 +43,10 @@ class EdamamRepository(BaseEdamamRepository):
         label = food_data.get("label", "Unknown")
         nutrients = food_data.get("nutrients", {})
 
-        return EdamamNutritionInfo(
+        return EdamamNutritionInfoSchema(
             description=label,
             calories=nutrients.get("ENERC_KCAL", "N/A"),
-            protein=nutrients.get("PROCNT", "N/A"),
-            fat=nutrients.get("FAT", "N/A"),
-            carbs=nutrients.get("CHOCDF", "N/A")
+            protein_g=nutrients.get("PROCNT", "N/A"),
+            carbs_g=nutrients.get("CHOCDF", "N/A"),
+            fat_g=nutrients.get("FAT", "N/A"),
         )

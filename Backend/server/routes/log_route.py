@@ -15,7 +15,7 @@ async def post_log_food(food: FoodLogCreationSchema, user_id: int = Query(...)):
     Log.print_debug(user_id)
     Log.print_debug(food)
     try:
-        user = DatabaseService.get_user_by_id(user_id)
+        _ = DatabaseService.get_user_by_id(user_id)
     except DoesNotExistException as e:
         raise HTTPException(404, e.args[0])
 
@@ -29,7 +29,6 @@ async def post_log_scan(file: UploadFile = File(...)):
         detected_foods = YoloService.analyze_image(file.file.read())
     except NoFoodDetectedException as e:
         raise HTTPException(422, e.args[0])
-
 
     foods: list[ScannedFoodWithInfoSchema] = []
     for food in detected_foods:

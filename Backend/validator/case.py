@@ -24,6 +24,13 @@ def pretty_print(content: dict[str, Any]) -> str:
 
 @dataclass
 class Case:
+    """
+    Defines a test case for the COUNT back-end api.
+    
+    Prefix with `.expects()` to set expected values.
+    
+    Execute test with `.test()`. This returns a `Result` object.
+    """
     name: str
     endpoint: str
     method: Literal['GET', 'POST', 'PUT', 'DELETE', 'OPTION', 'PATCH']
@@ -31,6 +38,7 @@ class Case:
     description: str = ""
     image_path: str | None = None
     image_type: Literal['image/jpeg', 'image/png'] | None = None
+    
     files: dict[str, tuple[str, bytes, Literal['image/jpeg', 'image/png']]] | None = (
         field(init=False, default=None)
     )
@@ -63,6 +71,18 @@ class Case:
         content: dict[str, Any] | None = None,
         check: Callable[[dict[str, Any]], str | None] | None = None,
     ):
+        """
+        Set an expectation for the test.
+        
+        Each fields can be `None` to be ignored during evaluation.
+        
+        Args:
+            status_code (int or None) (Positional): The expected http status code.
+            content (dict or None) (Keyword): The expected return content.
+            check (Callable(dict) -> str or None) (Keyword): A callable function.\
+            Alternative to `content` where the actual returned content is passed to the function.\
+            The function must return `None` if it is correct, otherwise return an error message str.
+        """
         self.expected_code = status_code
         self.expected_content = content
         self.check = check
@@ -116,9 +136,9 @@ class Result:
 
     @property
     def content_matched(self) -> bool:
-        if not self.test_case.body:
+        if not self.test_case.expected_content:
             return True
-        if self.test_case.body == self.content:
+        if self.test_case.expected_content == self.content:
             return True
         self.status = ResultStatus.content_mismatch
         self.message = f'Response does not match expected content:\n{pretty_print(self.content)}'
@@ -130,6 +150,11 @@ class Result:
 
     @staticmethod
     def from_response(test_case: Case, res: Response) -> Result:
+        response = res.content.decode()
+        if response == 'Internal Server Error':
+            return Result(
+                test_case, status_code=500, content={'message': 'Internal Server Error'}
+            )
         return Result(
             test_case=test_case,
             status_code=res.status_code,

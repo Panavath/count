@@ -1,14 +1,15 @@
 import requests
 
 from cases import cases
-from case import Result, ResultStatus
+from case import ResultStatus
 from colors import *
 
 if __name__ == '__main__':
     session = requests.Session()
     failed_cases: list[tuple[int, str]] = []
     case_len = len(cases)
-
+    
+    
     for i, test in enumerate(cases):
         print()
         print(BColor.CYAN + f'Testing case {i+1}/{case_len}:' + BColor.ENDC, test.name)
@@ -32,9 +33,13 @@ if __name__ == '__main__':
         except requests.exceptions.RequestException as e:
             print_error(f'Request failed: {e}')
             failed_cases.append((i + 1, f'Connection error: {e}'))
-            
+
+    print()
+    print()
     if len(failed_cases) > 0:
-        print(BColor.RED + '\nFailed cases:' + BColor.ENDC)
+        print(BColor.RED + 'Failed cases:' + BColor.ENDC)
         for case in failed_cases:
             index, reason = case
             print_error(f'Case {index}: {reason}')
+    else:
+        print(BColor.GREEN + BColor.BOLD + 'All tests passed.' + BColor.ENDC)

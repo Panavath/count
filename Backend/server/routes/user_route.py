@@ -19,7 +19,7 @@ async def get_user(user_id: int = Query(...)):
 
 @user_router.get('/all')
 async def get_all_users():
-    return DatabaseService.get_all_users()
+    return {'users': DatabaseService.get_all_users()}
 
 
 @user_router.post('/')

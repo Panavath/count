@@ -32,3 +32,12 @@ async def seed_tables_route():
         raise HTTPException(405, 'Operation not allowed')
     DatabaseService.new_user('Hout Manut')
     return {'message': 'Tables seeded successfully'}
+
+@debug_router.get('/reset')
+async def reset_db_route():
+    if ENV_MODE != 'DEV':
+        raise HTTPException(405, 'Operation not allowed')
+    drop_all_tables()
+    create_tables()
+    DatabaseService.new_user('Hout Manut')
+    return 200

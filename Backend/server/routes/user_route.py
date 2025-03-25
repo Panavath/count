@@ -17,7 +17,7 @@ async def get_user(user_id: int = Query(...)):
         raise HTTPException(404, e.args[0])
 
 
-@user_router.get('/all')
+@user_router.get('/all/')
 async def get_all_users():
     return {'users': DatabaseService.get_all_users()}
 

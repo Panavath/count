@@ -51,6 +51,8 @@ class EdamamRepository(BaseEdamamRepository):
             )
 
         data = response.content.decode()
+        if "hints" not in data:
+            raise RuntimeError(f"No food items found for '{ingr}'.")
         new_cache = EdamamCacheTable(key=ingr, value=data)
         self.db_session.add(new_cache)
         self.db_session.commit()
@@ -59,8 +61,6 @@ class EdamamRepository(BaseEdamamRepository):
 
     def get_nutrition_info(self, scanned_food: BaseScannedFoodSchema) -> EdamamNutritionInfoSchema:
         data = self.get_nutrition_info_api(scanned_food.class_name)
-        if "hints" not in data or not data["hints"]:
-            raise RuntimeError(f"No food items found for '{scanned_food.class_name}'.")
 
         food_data = data["hints"][0]["food"]
         label = food_data.get("label", "Unknown")

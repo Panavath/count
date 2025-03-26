@@ -18,7 +18,7 @@ async def drop_tables_route():
     return {'message': 'Tables dropped successfully'}
 
 
-@debug_router.get('/drop-tables')
+@debug_router.get('/create-tables')
 async def create_tables_route():
     if ENV_MODE != 'DEV':
         raise HTTPException(405, 'Operation not allowed')

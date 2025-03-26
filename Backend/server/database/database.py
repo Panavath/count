@@ -22,4 +22,4 @@ def create_tables():
 
 
 def drop_all_tables():
-    BaseTable.metadata.drop_all(engine)
+    BaseTable.metadata.drop_all(engine.connect(), checkfirst=False)

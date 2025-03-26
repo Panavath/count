@@ -11,6 +11,7 @@ app = FastAPI()
 EdamamService.initialize(EdamamRepository())
 YoloService.initialize("UECFood256.pt")
 DatabaseService.initialize(db_repo=BaseDBRepository())
+SearchService.initialize(CacheSearchRepo())
 
 
 @app.get('/')

@@ -136,3 +136,51 @@ cython_debug/
 .pypirc
 
 .vscode
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+!/Frontend/lib/
+/Frontend/ios
+/Frontend/android
+/Frontend/linux
+/Frontend/macos
+/Frontend/windows
+/Frontend/web
+/Frontend/pubspec.lock
+/Frontend/analysis_options.yaml

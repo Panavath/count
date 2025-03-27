@@ -15,7 +15,6 @@ class CacheSearchRepo(BaseSearchRepo):
     def __init__(self) -> None:
         self.session = SessionLocal()
         self._cache = []
-        self.update_cache()
 
     def update_cache(self) -> None:
         cached_data = self.session.query(EdamamCacheTable).all()
@@ -31,10 +30,10 @@ class CacheSearchRepo(BaseSearchRepo):
             self._cache.append(
                 EdamamNutritionInfoSchema(
                     description=label,
-                    calories=nutrients.get("ENERC_KCAL", "N/A"),
-                    protein_g=nutrients.get("PROCNT", "N/A"),
-                    carbs_g=nutrients.get("CHOCDF", "N/A"),
-                    fat_g=nutrients.get("FAT", "N/A"),
+                    calories=round(nutrients.get("ENERC_KCAL", 0.0), 2),
+                    protein_g=round(nutrients.get("PROCNT", 0.0), 2),
+                    carbs_g=round(nutrients.get("CHOCDF", 0.0), 2),
+                    fat_g=round(nutrients.get("FAT", 0.0), 2),
                 )
             )
 
@@ -46,5 +45,5 @@ class CacheSearchRepo(BaseSearchRepo):
         for food in self._cache:
             if query in food.description.lower():
                 found_foods.append(food)
-                
+
         return found_foods

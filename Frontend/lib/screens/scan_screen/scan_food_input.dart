@@ -1,35 +1,26 @@
 import 'dart:io';
-import 'package:count_frontend/providers/user_data_provider.dart';
 import 'package:count_frontend/screens/scan_screen/image_picking_function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
+// import 'package:image_picker/image_picker.dart';
 import '/utility/app_theme.dart';
-  // Import the state management class
 
 class ScanFoodScreen extends StatefulWidget {
+  const ScanFoodScreen({super.key});
+
   @override
-  _ScanFoodScreenState createState() => _ScanFoodScreenState();
+  State<ScanFoodScreen> createState() => _ScanFoodScreenState();
 }
 
 class _ScanFoodScreenState extends State<ScanFoodScreen> {
   File? _image;
-  final ImagePicker _picker = ImagePicker();
+  // final ImagePicker _picker = ImagePicker();
   bool _isImageCaptured = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // If you want to pick an image immediately when the screen is loaded, you can call _pickImage() here
-  }
 
   Future<void> _pickImage() async {
     // Picking image logic using ImagePickerHelper
     File? selectedImage = await ImagePickerHelper.pickImageAndUpload(context);
     if (selectedImage != null) {
-      // Update the provider with the image path
-      Provider.of<UserDataProvider>(context, listen: false).setImagePath(selectedImage.path);
 
       // Additional logic like processing the image
       print("Processing image: ${selectedImage.path}");
@@ -49,7 +40,6 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
       _isImageCaptured = false;
     });
 
-    // You can go back or handle navigation if needed
     Navigator.pop(context);
   }
 
@@ -57,16 +47,16 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Meal Scan', style: AppFonts.heading),
+        middle: const Text('Meal Scan', style: AppFonts.heading),
         backgroundColor: AppColors.primaryBlue,
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.back, color: Colors.white),
+          child: const Icon(CupertinoIcons.back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.question_circle, color: Colors.white),
+          child: const Icon(CupertinoIcons.question_circle, color: Colors.white),
           onPressed: () {
             print("Help clicked");
           },
@@ -77,7 +67,7 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
           Expanded(
             child: Center(
               child: _image == null
-                  ? Column(
+                  ? const Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(CupertinoIcons.camera_fill, size: 100, color: Colors.grey),
@@ -103,8 +93,8 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Text(
                           "Tap the button to detect items in your meal",
                           style: AppFonts.body,
                           textAlign: TextAlign.center,
@@ -119,7 +109,7 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
               onPressed: _isImageCaptured ? _saveImage : _pickImage,
               color: _isImageCaptured ? CupertinoColors.systemGreen : CupertinoColors.activeBlue,
               borderRadius: BorderRadius.circular(30),
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Icon(
                 _isImageCaptured ? CupertinoIcons.checkmark_alt : CupertinoIcons.camera_fill,
                 color: Colors.white,

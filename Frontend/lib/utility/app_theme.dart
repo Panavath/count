@@ -7,7 +7,7 @@ class AppColors {
   static const Color lightBlue = Color(0xFF64D2FF);
   static const Color darkBlue = Color(0xFF0040DD);
   static const Color accentBlue = Color(0xFF32ADE6);
-  
+
   static const Color background = Color(0xFFF2F2F7);
   static const Color white = Colors.white;
   static const Color black = Colors.black;
@@ -16,7 +16,7 @@ class AppColors {
   static const Color textSecondary = Color(0xFF636366);
   static const Color error = Color(0xFFFF3B30);
   static const Color accent = Color(0xFFFF9500);
-  
+
   static const Color buttonBackground = CupertinoColors.activeBlue;
   static const Color buttonText = CupertinoColors.white;
 }
@@ -85,7 +85,7 @@ class AppButton {
     );
   }
 
-   static Widget primaryButton({
+  static Widget primaryButton({
     required String text,
     required VoidCallback onPressed,
   }) {

@@ -1,29 +1,29 @@
+import 'package:count_frontend/models/scanned_food.dart';
+import 'package:count_frontend/providers/user_data_provider.dart';
 import 'package:count_frontend/utility/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/user_data_provider.dart';  // Import the state management class
 
 class ResultsScreen extends StatefulWidget {
-  final List<dynamic> results;
+  final List<ScannedFood> results;
 
-  const ResultsScreen({Key? key, required this.results}) : super(key: key);
+  const ResultsScreen({super.key, required this.results});
 
   @override
-  _ResultsScreenState createState() => _ResultsScreenState();
+  State<ResultsScreen> createState() => _ResultsScreenState();
 }
 
 class _ResultsScreenState extends State<ResultsScreen> {
-  late List<dynamic> foodList;
-  Set<Map<String, dynamic>> selectedItems = {}; // Stores selected food data
+  late List<ScannedFood> foodList;
+  Set<ScannedFood> selectedItems = {}; // Stores selected food data
 
   @override
   void initState() {
     super.initState();
-    foodList = List.from(widget.results);
-    print(foodList); // Create a copy of the list
+    foodList = widget.results;
   }
 
-  void _toggleSelection(Map<String, dynamic> food) {
+  void _toggleSelection(ScannedFood food) {
     setState(() {
       if (selectedItems.contains(food)) {
         selectedItems.remove(food);
@@ -34,84 +34,87 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   // Show dialog for food name and meal type input
-Future<void> _showFoodInputDialog() async {
-  final TextEditingController foodNameController = TextEditingController();
-  String selectedMealType = 'Breakfast';  // Default value for meal type
+  Future<void> _showFoodInputDialog() async {
+    final TextEditingController foodNameController = TextEditingController();
+    String selectedMealType = 'Breakfast'; // Default value for meal type
 
-  return showDialog<void>(
-    context: context,
-    barrierDismissible: true,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: Text('Enter Food Information', textAlign: TextAlign.center),
-        content: StatefulBuilder(
-          builder: (BuildContext context, setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextField(
-                  controller: foodNameController,
-                  decoration: InputDecoration(labelText: 'Food Name'),
-                ),
-                SizedBox(height: 10),
-                DropdownButton<String>(
-                  isExpanded: true,
-                  value: selectedMealType,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedMealType = newValue ?? 'Breakfast'; // Update selectedMealType
-                    });
-                  },
-                  items: <String>['Breakfast', 'Lunch', 'Dinner', 'Snack']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ],
-            );
-          },
-        ),
-        actions: <Widget>[
-          AppButton.primaryButton(
-            onPressed: () {
-              String foodName = foodNameController.text.isNotEmpty
-                  ? foodNameController.text
-                  : 'Unknown Food';  
-
-              List<dynamic> selectedFoods = selectedItems.toList();
-
-              // Send the selected foods to the backend via UserDataProvider
-              Provider.of<UserDataProvider>(context, listen: false)
-                  .addFoodHistory(selectedFoods, foodName, selectedMealType);
-
-              // Close the dialog
-              Navigator.of(context).pop();
-              // Navigate back to home screen after saving
-              Navigator.popUntil(context, ModalRoute.withName('/'));
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title:
+              const Text('Enter Food Information', textAlign: TextAlign.center),
+          content: StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    controller: foodNameController,
+                    decoration: const InputDecoration(labelText: 'Food Name'),
+                  ),
+                  const SizedBox(height: 10),
+                  DropdownButton<String>(
+                    isExpanded: true,
+                    value: selectedMealType,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedMealType =
+                            newValue ?? 'Breakfast'; // Update selectedMealType
+                      });
+                    },
+                    items: <String>['Breakfast', 'Lunch', 'Dinner', 'Snack']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              );
             },
-            text: 'Save',
           ),
-          AppButton.secondaryButton(
-            onPressed: () {
-              Navigator.of(context).pop();  // Close the dialog
-            },
-            text: 'Cancel'
-          ),
-        ],
-      );
-    },
-  );
-}
+          actions: <Widget>[
+            AppButton.primaryButton(
+              onPressed: () {
+                String foodName = foodNameController.text.isNotEmpty
+                    ? foodNameController.text
+                    : 'Unknown Food';
 
+                List<ScannedFood> selectedFoods = selectedItems.toList();
+
+                // Send the selected foods to the backend via UserDataProvider
+                Provider.of<UserDataProvider>(context, listen: false).newLog(
+                    name: foodName,
+                    date: DateTime.now(),
+                    mealTypeString: selectedMealType,
+                    foods: selectedFoods);
+
+                // Close the dialog
+                Navigator.of(context).pop();
+                // Navigate back to home screen after saving
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              },
+              text: 'Save',
+            ),
+            AppButton.secondaryButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                text: 'Cancel'),
+          ],
+        );
+      },
+    );
+  }
 
   // Add result when "Add Selected Foods" is pressed
   void _addResult() {
     if (selectedItems.isEmpty) {
       // If no food is selected, show a warning message
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Please select some foods first!'),
       ));
       return;
@@ -125,7 +128,7 @@ Future<void> _showFoodInputDialog() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Results', style: TextStyle(color: Colors.white)),
+        title: const Text('Results', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.blue,
         elevation: 0,
@@ -144,12 +147,12 @@ Future<void> _showFoodInputDialog() async {
                   return GestureDetector(
                     onTap: () => _toggleSelection(result),
                     child: Container(
-                      margin: EdgeInsets.symmetric(vertical: 5),
-                      padding: EdgeInsets.all(16),
+                      margin: const EdgeInsets.symmetric(vertical: 5),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: isSelected ? Colors.greenAccent : Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             color: Colors.black12,
                             blurRadius: 5,
@@ -159,29 +162,27 @@ Future<void> _showFoodInputDialog() async {
                       ),
                       child: Row(
                         children: [
-                          if (result['image'] != null)
-                            Image.asset(
-                              result['image'],
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(result['class_name'], style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                                SizedBox(height: 5),
-                                Text("Calories: ${result['nutrition_info']['calories']} kcal"),
-                                Text("Protein: ${result['nutrition_info']['protein_g']} g"),
-                                Text("Carbs: ${result['nutrition_info']['carbs_g']} g"),
-                                Text("Fat: ${result['nutrition_info']['fat_g']} g"),
+                                Text(result.className,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                const SizedBox(height: 5),
+                                Text("Calories: ${result.calories} kcal"),
+                                Text("Protein: ${result.proteinG} g"),
+                                Text("Carbs: ${result.carbsG} g"),
+                                Text("Fat: ${result.fatG} g"),
                               ],
                             ),
                           ),
                           Icon(
-                            isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                            isSelected
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
                             color: isSelected ? Colors.green : Colors.grey,
                           ),
                         ],
@@ -193,13 +194,15 @@ Future<void> _showFoodInputDialog() async {
             ),
           ),
           ElevatedButton(
-            onPressed: _addResult,  // Show dialog when pressed
-            child: Text("Add Selected Foods"),
+            onPressed: _addResult,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green, // Set the background color of the button
-              padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-              textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+              backgroundColor:
+                  Colors.green, // Set the background color of the button
+              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+              textStyle:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ), // Show dialog when pressed
+            child: const Text("Add Selected Foods"),
           ),
         ],
       ),

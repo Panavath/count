@@ -1,104 +1,187 @@
-import 'dart:io';
+import 'package:count_frontend/models/user.dart';
+import 'package:count_frontend/providers/async_value.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/user_data_provider.dart';  // Import the state management class
+import '../providers/user_data_provider.dart'; // Import the state management class
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
+  void register(context) async {
+    showModalBottomSheet(
+        context: context, builder: (context) => _RegisterModal());
+  }
+
+  Widget buildBody(BuildContext context, UserDataProvider provider) {
+    switch (provider.currentUser.state) {
+      case AsyncValueState.none:
+        provider.logIn();
+        return const Center(
+          child: Text('Loading user data...'),
+        );
+      case AsyncValueState.loading:
+        return const Center(
+          child: Text('Loading user data...'),
+        );
+      case AsyncValueState.error:
+        return const Center(
+          child: Text('Error retrieving user data'),
+        );
+      case AsyncValueState.success:
+        return ListView.builder(
+            itemCount: provider.currentUser.data!.foodLogs.length,
+            itemBuilder: (context, index) {
+              User user = provider.currentUser.data!;
+              final foodLog = user.foodLogs.firstOrNull;
+
+              final foodName = foodLog?.name ?? 'Unknown';
+              final foodCalories = foodLog?.totalCalories ?? 0.0;
+              final foodProtein = foodLog?.totalProtein ?? 0.0;
+              final foodCarbs = foodLog?.totalCarbs ?? 0.0;
+              final foodFat = foodLog?.totalFat ?? 0.0;
+
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                elevation: 5, // Enhanced elevation for better shadow effect
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15)),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.all(16),
+                  // leading: CircleAvatar(
+                  //   backgroundImage: provider.imagePath != null
+                  //       ? FileImage(File(provider
+                  //           .imagePath!)) // Use image path from the provider
+                  //       : const AssetImage('assets/default_image.png')
+                  //           as ImageProvider,
+                  //   radius: 30,
+                  // ),
+                  title: Text(foodName,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                    'Calories: $foodCalories kcal\n'
+                    'Protein: ${foodProtein}g\n'
+                    'Carbs: ${foodCarbs}g\n'
+                    'Fat: ${foodFat}g',
+                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                  ),
+                  trailing: const Icon(Icons.more_vert, color: Colors.grey),
+                ),
+              );
+            });
+      case AsyncValueState.empty:
+        return Center(
+          child: ElevatedButton(
+            onPressed: () {
+              register(context);
+            },
+            child: const Text('Register'),
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    UserDataProvider provider = context.watch<UserDataProvider>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Food Log',
+        title: const Text('Food Log',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blueAccent,
         elevation: 5,
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               // Search functionality can be added here
-              print("Search clicked");
+              debugPrint("Search clicked");
             },
           )
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Consumer<UserDataProvider>(
-          builder: (context, provider, child) {
-            return ListView.builder(
-              itemCount: provider.foodHistory.length,
-              itemBuilder: (context, index) {
-                final foodLog = provider.foodHistory[index];
-
-                // Assuming foodLog['foods'] contains a list of food items
-                final food = foodLog['foods']?.first ??
-                    {}; // Access the first food item (or empty map if not available)
-
-                // Safely accessing food properties
-                final foodName = food['name'] ?? 'Unknown'; // Default to 'Unknown' if null
-                final foodCalories = food['calories'] ?? 0.0;
-                final foodProtein = food['protein_g'] ?? 0.0;
-                final foodCarbs = food['carbs_g'] ?? 0.0;
-                final foodFat = food['fat_g'] ?? 0.0;
-
-                return Card(
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  elevation: 5, // Enhanced elevation for better shadow effect
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(16),
-                    leading: CircleAvatar(
-                      backgroundImage: provider.imagePath != null
-                          ? FileImage(File(provider.imagePath!)) // Use image path from the provider
-                          : AssetImage('assets/default_image.png') as ImageProvider,
-                      radius: 30,
-                    ),
-                    title: Text(foodName,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    subtitle: Text(
-                      'Calories: ${foodCalories} kcal\n'
-                      'Protein: ${foodProtein}g\n'
-                      'Carbs: ${foodCarbs}g\n'
-                      'Fat: ${foodFat}g',
-                      style: TextStyle(fontSize: 14, color: Colors.black),
-                    ),
-                    trailing: Icon(Icons.more_vert, color: Colors.grey),
-                    onTap: () {
-                      // Add onTap functionality if needed
-                    },
-                  ),
-                );
-              },
-            );
-          },
-        ),
+        child: buildBody(context, provider),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
+      floatingActionButton:
+          provider.currentUser.state == AsyncValueState.success
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Add the button for navigating to the ResultsScreen
+                    // FloatingActionButton(
+                    //   onPressed: () {
+                    //     Navigator.pushNamed(context, '/results');
+                    //   },
+                    //   backgroundColor: Colors.green,
+                    //   heroTag: null,
+                    //   child: const Icon(
+                    //       Icons.add), // Required to avoid duplicate hero tags
+                    // ),
+                    // const SizedBox(height: 16),
+                    // Add the button for navigating to the ScanScreen
+                    FloatingActionButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/scan');
+                      },
+                      backgroundColor: Colors.blueAccent,
+                      heroTag: null,
+                      child: const Icon(Icons
+                          .camera_alt), // Required to avoid duplicate hero tags
+                    ),
+                  ],
+                )
+              : null,
+    );
+  }
+}
+
+class _RegisterModal extends StatefulWidget {
+  @override
+  State<_RegisterModal> createState() => _RegisterModalState();
+}
+
+class _RegisterModalState extends State<_RegisterModal> {
+  final TextEditingController controller = TextEditingController();
+
+  void onAdd() {
+    if (controller.text.isEmpty) return;
+
+    UserDataProvider user = context.read<UserDataProvider>();
+    user.signUp(controller.text);
+    Navigator.pop(context);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Add the button for navigating to the ResultsScreen
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/results');
-            },
-            child: Icon(Icons.add),
-            backgroundColor: Colors.green,
-            heroTag: null, // Required to avoid duplicate hero tags
+          TextField(
+            controller: controller,
+            decoration: const InputDecoration(label: Text('Username')),
           ),
-          SizedBox(height: 16),
-          // Add the button for navigating to the ScanScreen
-          FloatingActionButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/scan');
-            },
-            child: Icon(Icons.camera_alt),
-            backgroundColor: Colors.blueAccent,
-            heroTag: null, // Required to avoid duplicate hero tags
-          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              SizedBox(
+                width: 200,
+                child: ElevatedButton(
+                    onPressed: onAdd, child: const Text('Register')),
+              )
+            ],
+          )
         ],
       ),
     );

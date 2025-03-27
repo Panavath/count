@@ -1,27 +1,51 @@
+import 'package:count_frontend/dto/food_log_dto.dart';
+import 'package:count_frontend/models/scanned_food.dart';
 import 'package:count_frontend/screens/food_input_result_screen.dart';
 import 'package:count_frontend/utility/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class FoodInputScreen extends StatefulWidget {
+  const FoodInputScreen({super.key});
+
   @override
-  _FoodInputScreenState createState() => _FoodInputScreenState();
+  State<FoodInputScreen> createState() => _FoodInputScreenState();
 }
 
 class _FoodInputScreenState extends State<FoodInputScreen> {
   final List<Map<String, dynamic>> _ingredients = [];
   final TextEditingController _inputController = TextEditingController();
 
-  final List<Map<String, dynamic>> _mockResults = [
-    {'name': 'Apple', 'calories': 52, 'protein': 0.3, 'carbs': 14, 'fat': 0.2},
-    {'name': 'Banana', 'calories': 89, 'protein': 1.1, 'carbs': 23, 'fat': 0.3},
-    {
-      'name': 'Chicken Breast',
+  final List<ScannedFood> _mockResults = [
+    ScannedFoodDto.fromJson({
+      'class_name': 'Apple',
+      'description': 'apple',
+      'serving_size': 1.0,
+      'confidence': 0.8,
+      'calories': 52,
+      'protein_g': 0.3,
+      'carbs_g': 14,
+      'fat_g': 0.2
+    }),
+    ScannedFoodDto.fromJson({
+      'class_name': 'Banana',
+      'description': 'banana',
+      'serving_size': 1.0,
+      'confidence': 0.8,
+      'calories': 89,
+      'protein': 1.1,
+      'carbs': 23,
+      'fat': 0.3
+    }),
+    ScannedFoodDto.fromJson({
+      'class_name': 'Chicken Breast',
+      'description': 'chicken',
+      'serving_size': 1.0,
+      'confidence': 0.8,
       'calories': 165,
       'protein': 31,
       'carbs': 0,
       'fat': 3.6
-    },
+    }),
   ];
 
   void _addIngredient() {
@@ -52,11 +76,11 @@ class _FoodInputScreenState extends State<FoodInputScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Food Input', style: AppFonts.heading),
+        title: const Text('Food Input', style: AppFonts.heading),
         centerTitle: true,
         backgroundColor: AppColors.background,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       backgroundColor: AppColors.background,
       body: Padding(
@@ -67,7 +91,7 @@ class _FoodInputScreenState extends State<FoodInputScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black12,
                     blurRadius: 5,
@@ -77,7 +101,7 @@ class _FoodInputScreenState extends State<FoodInputScreen> {
               ),
               child: TextField(
                 controller: _inputController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   hintText: 'Enter ingredient, quantity (e.g., Apple, 100)',
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.all(24),
@@ -88,7 +112,7 @@ class _FoodInputScreenState extends State<FoodInputScreen> {
                 style: AppFonts.body,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             AppButton.fullWidthButton(
               text: "Enter",
               onPressed: _showResultsHandler,

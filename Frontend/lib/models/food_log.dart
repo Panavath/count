@@ -1,3 +1,5 @@
+import 'package:count_frontend/models/food.dart';
+
 class FoodLog {
   final int id;
   final int userId;
@@ -5,6 +7,7 @@ class FoodLog {
   final double quantity;
   final String mealType;
   final DateTime date;
+  final Food food;
 
   FoodLog({
     required this.id,
@@ -13,5 +16,6 @@ class FoodLog {
     required this.quantity,
     required this.mealType,
     required this.date,
+    required this.food
   });
 }

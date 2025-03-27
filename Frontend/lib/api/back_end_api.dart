@@ -1,6 +1,9 @@
+import 'package:count_frontend/dto/creation_dto.dart';
 import 'package:count_frontend/dto/food_log_dto.dart';
+import 'package:count_frontend/dto/search_dto.dart';
 import 'package:count_frontend/dto/user_dto.dart';
 import 'package:count_frontend/models/scanned_food.dart';
+import 'package:count_frontend/models/search_result.dart';
 import 'package:count_frontend/utility/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:count_frontend/models/user.dart';
@@ -24,7 +27,8 @@ class BackendApi {
   }
 
   static Future<User> newUser(String userName) async {
-    Response userRes = await dio.post('$url/user/?user_name=$userName');
+    Response userRes =
+        await dio.post('$url/user/', queryParameters: {'user_name': userName});
     if (userRes.statusCode == HttpStatus.ok) {
       return UserDto.fromJson(userRes.data);
     }
@@ -42,8 +46,8 @@ class BackendApi {
   }) async {
     Map<String, dynamic> newLogJson = FoodLogCreationDto.toJson(
         name: name, mealTypeString: mealTypeString, date: date, foods: foods);
-    Response userRes =
-        await dio.post('$url/log/food/?user_id=$userId', data: newLogJson);
+    Response userRes = await dio.post('$url/log/food/',
+        queryParameters: {'user_id': userId}, data: newLogJson);
     if (userRes.statusCode == HttpStatus.ok) {
       return UserDto.fromJson(userRes.data);
     }
@@ -73,6 +77,27 @@ class BackendApi {
             'Error scanning the image with status: ${imageRes.statusCode}');
       }
     } catch (e) {
+      rethrow;
+    }
+  }
+
+  static Future<List<SearchResult>> search(String query) async {
+    try {
+      Response searchRes =
+          await dio.get('$url/search/food/', queryParameters: {'query': query});
+
+      if (searchRes.statusCode == HttpStatus.ok) {
+        List<Map<String, dynamic>> searchResults =
+            castListDynamicToListMap(searchRes.data['results']);
+
+        return List.generate(searchResults.length,
+            (index) => SearchDto.fromJson(searchResults[index]));
+      } else {
+        throw Exception(
+            'Error scanning the image with status: ${searchRes.statusCode}');
+      }
+    } catch (e) {
+      print(e);
       rethrow;
     }
   }

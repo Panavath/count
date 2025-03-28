@@ -1,4 +1,10 @@
+import 'dart:async';
+
+import 'package:count_frontend/api/back_end_api.dart';
+import 'package:count_frontend/dto/search_dto.dart';
 import 'package:count_frontend/models/scanned_food.dart';
+import 'package:count_frontend/models/search_result.dart';
+import 'package:count_frontend/providers/async_value.dart';
 import 'package:count_frontend/providers/user_data_provider.dart';
 import 'package:count_frontend/utility/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -19,8 +25,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   @override
   void initState() {
+    foodList = [...widget.results];
     super.initState();
-    foodList = widget.results;
+  }
+
+  @override
+  void didUpdateWidget(covariant ResultsScreen oldWidget) {
+    foodList = [...widget.results];
+    super.didUpdateWidget(oldWidget);
   }
 
   void _toggleSelection(ScannedFood food) {
@@ -33,9 +45,45 @@ class _ResultsScreenState extends State<ResultsScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    foodSearchController.dispose();
+    foodNameController.dispose();
+    super.dispose();
+  }
+
+  final TextEditingController foodSearchController = TextEditingController();
+
+  void searchFood() async {
+    foodSearchController.text = '';
+    ScannedFood? newFood = await showDialog<ScannedFood>(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Search Food',
+            textAlign: TextAlign.center,
+          ),
+          content: SearchWidget(
+            foodSearchController: foodSearchController,
+          ),
+        );
+      },
+    );
+
+    if (newFood != null) {
+      foodList.remove(newFood);
+      foodList.add(newFood);
+      selectedItems.add(newFood);
+      setState(() {});
+    }
+  }
+
+  final TextEditingController foodNameController = TextEditingController();
   // Show dialog for food name and meal type input
   Future<void> _showFoodInputDialog() async {
-    final TextEditingController foodNameController = TextEditingController();
+    foodNameController.text = '';
     String selectedMealType = 'Breakfast'; // Default value for meal type
 
     return showDialog<void>(
@@ -52,7 +100,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 children: <Widget>[
                   TextField(
                     controller: foodNameController,
-                    decoration: const InputDecoration(labelText: 'Food Name'),
+                    decoration: const InputDecoration(labelText: 'Meal Name'),
                   ),
                   const SizedBox(height: 10),
                   DropdownButton<String>(
@@ -138,59 +186,65 @@ class _ResultsScreenState extends State<ResultsScreen> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: ListView.builder(
-                itemCount: foodList.length,
-                itemBuilder: (context, index) {
-                  final result = foodList[index];
-                  final isSelected = selectedItems.contains(result);
+              child: foodList.isEmpty
+                  ? const Center(child: Text('No foods found. Add some.'))
+                  : ListView.builder(
+                      itemCount: foodList.length,
+                      itemBuilder: (context, index) {
+                        final result = foodList[index];
+                        final isSelected = selectedItems.contains(result);
 
-                  return GestureDetector(
-                    onTap: () => _toggleSelection(result),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 5),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.greenAccent : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 5,
-                            spreadRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        return GestureDetector(
+                          onTap: () => _toggleSelection(result),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 5),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? Colors.greenAccent
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 5,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: Row(
                               children: [
-                                Text(result.className,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 5),
-                                Text("Calories: ${result.calories} kcal"),
-                                Text("Protein: ${result.proteinG} g"),
-                                Text("Carbs: ${result.carbsG} g"),
-                                Text("Fat: ${result.fatG} g"),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(result.className,
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 5),
+                                      Text("Calories: ${result.calories} kcal"),
+                                      Text("Protein: ${result.proteinG} g"),
+                                      Text("Carbs: ${result.carbsG} g"),
+                                      Text("Fat: ${result.fatG} g"),
+                                    ],
+                                  ),
+                                ),
+                                Icon(
+                                  isSelected
+                                      ? Icons.check_circle
+                                      : Icons.radio_button_unchecked,
+                                  color:
+                                      isSelected ? Colors.green : Colors.grey,
+                                ),
                               ],
                             ),
                           ),
-                          Icon(
-                            isSelected
-                                ? Icons.check_circle
-                                : Icons.radio_button_unchecked,
-                            color: isSelected ? Colors.green : Colors.grey,
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ),
           ElevatedButton(
@@ -206,6 +260,120 @@ class _ResultsScreenState extends State<ResultsScreen> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: searchFood,
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class SearchWidget extends StatefulWidget {
+  const SearchWidget({
+    super.key,
+    required this.foodSearchController,
+  });
+
+  final TextEditingController foodSearchController;
+
+  @override
+  State<SearchWidget> createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<SearchWidget> {
+  AsyncValue<List<SearchResult>> searchResult = AsyncValue.empty();
+
+  void search(String query) async {
+    setState(() {
+      searchResult = AsyncValue.loading();
+    });
+    try {
+      List<SearchResult> results = await BackendApi.search(query);
+      if (results.isEmpty) {
+        searchResult = AsyncValue.empty();
+      } else {
+        searchResult = AsyncValue.success(results);
+      }
+    } catch (e) {
+      searchResult = AsyncValue.error(e);
+    }
+    setState(() {});
+  }
+
+  Timer? timer;
+
+  void onChanged(String text) {
+    if (text.isEmpty) {
+      return;
+    }
+    if (timer?.isActive ?? false) {
+      timer!.cancel();
+    }
+    timer = Timer(const Duration(milliseconds: 500), () => search(text));
+  }
+
+  Widget buildResults(BuildContext context) {
+    switch (searchResult.state) {
+      case AsyncValueState.none:
+        return const Text('Start searching');
+
+      case AsyncValueState.loading:
+        return const Text('Searching...');
+      case AsyncValueState.error:
+        return const Text('Error searching for foods.');
+      case AsyncValueState.success:
+        List<SearchResult> results = searchResult.data!;
+        return Column(
+          children: List.generate(
+            results.length,
+            (index) {
+              final result = results[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                elevation: 5,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    Navigator.of(context).pop(SearchDto.toScannedFood(result));
+                  },
+                  contentPadding: const EdgeInsets.all(16),
+                  title: Text(result.description,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  subtitle: Text(
+                    'Calories: ${result.calories} kcal',
+                    style: const TextStyle(fontSize: 14, color: Colors.black),
+                  ),
+                  trailing: const Icon(Icons.more_vert, color: Colors.grey),
+                ),
+              );
+            },
+          ),
+        );
+      case AsyncValueState.empty:
+        return const Text('No results.');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextField(
+          controller: widget.foodSearchController,
+          decoration: const InputDecoration(labelText: 'Food Name'),
+          onChanged: onChanged,
+        ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 200,
+          child: SingleChildScrollView(child: buildResults(context)),
+        )
+      ],
     );
   }
 }

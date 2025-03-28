@@ -37,7 +37,6 @@ class YoloService:
         Returns:
             list[ScannedFood]: the list of detected food information
         """
-        return [BaseScannedFoodSchema(class_name='hamburger', confidence=84.34285737, bbox=[])]
         np_img = np.frombuffer(file_content, np.uint8)
         img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
 

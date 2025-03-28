@@ -24,21 +24,32 @@ class HomeScreen extends StatelessWidget {
           child: Text('Loading user data...'),
         );
       case AsyncValueState.error:
-        return const Center(
-          child: Text('Error retrieving user data'),
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('No user data found'),
+              ElevatedButton(
+                onPressed: () {
+                  register(context);
+                },
+                child: const Text('Re-Register'),
+              )
+            ],
+          ),
         );
       case AsyncValueState.success:
         return ListView.builder(
             itemCount: provider.currentUser.data!.foodLogs.length,
             itemBuilder: (context, index) {
               User user = provider.currentUser.data!;
-              final foodLog = user.foodLogs.firstOrNull;
+              final foodLog = user.foodLogs[index];
 
-              final foodName = foodLog?.name ?? 'Unknown';
-              final foodCalories = foodLog?.totalCalories ?? 0.0;
-              final foodProtein = foodLog?.totalProtein ?? 0.0;
-              final foodCarbs = foodLog?.totalCarbs ?? 0.0;
-              final foodFat = foodLog?.totalFat ?? 0.0;
+              final foodName = foodLog.name;
+              final foodCalories = foodLog.totalCalories;
+              final foodProtein = foodLog.totalProtein;
+              final foodCarbs = foodLog.totalCarbs;
+              final foodFat = foodLog.totalFat;
 
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8),
@@ -112,16 +123,16 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     // Add the button for navigating to the ResultsScreen
-                    // FloatingActionButton(
-                    //   onPressed: () {
-                    //     Navigator.pushNamed(context, '/results');
-                    //   },
-                    //   backgroundColor: Colors.green,
-                    //   heroTag: null,
-                    //   child: const Icon(
-                    //       Icons.add), // Required to avoid duplicate hero tags
-                    // ),
-                    // const SizedBox(height: 16),
+                    FloatingActionButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/results');
+                      },
+                      backgroundColor: Colors.green,
+                      heroTag: null,
+                      child: const Icon(
+                          Icons.add), // Required to avoid duplicate hero tags
+                    ),
+                    const SizedBox(height: 16),
                     // Add the button for navigating to the ScanScreen
                     FloatingActionButton(
                       onPressed: () {

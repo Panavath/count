@@ -18,4 +18,19 @@ class ScannedFood {
     required this.fatG,
     required this.servingSize,
   });
+
+  @override
+  String toString() {
+    return 'ScannedFood(cls=$className, des=$description, cal=$calories)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is ScannedFood &&
+        other.className == className &&
+        other.description == description;
+  }
+
+  @override
+  int get hashCode => className.hashCode ^ description.hashCode;
 }

@@ -28,7 +28,7 @@ async def post_log_scan(file: UploadFile = File(...)):
     try:
         detected_foods = YoloService.analyze_image(file.file.read())
     except NoFoodDetectedException as e:
-        raise HTTPException(422, e.args[0])
+        return {'foods': []}
 
     foods: list[ScannedFoodWithInfoSchema] = []
     for food in detected_foods:

@@ -15,10 +15,6 @@ class HomeScreen extends StatelessWidget {
   Widget buildBody(BuildContext context, UserDataProvider provider) {
     switch (provider.currentUser.state) {
       case AsyncValueState.none:
-        provider.logIn();
-        return const Center(
-          child: Text('Loading user data...'),
-        );
       case AsyncValueState.loading:
         return const Center(
           child: Text('Loading user data...'),

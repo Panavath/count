@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:count_frontend/api/back_end_api.dart';
 import 'package:count_frontend/dto/search_dto.dart';
+import 'package:count_frontend/enums/screen_types.dart';
 import 'package:count_frontend/models/scanned_food.dart';
 import 'package:count_frontend/models/search_result.dart';
 import 'package:count_frontend/providers/async_value.dart';
@@ -12,8 +13,10 @@ import 'package:provider/provider.dart';
 
 class ResultsScreen extends StatefulWidget {
   final List<ScannedFood> results;
+  final ResultScreenType screenType;
 
-  const ResultsScreen({super.key, required this.results});
+  const ResultsScreen(
+      {super.key, required this.results, required this.screenType});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
@@ -25,14 +28,25 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   @override
   void initState() {
-    foodList = [...widget.results];
+    updateState();
     super.initState();
   }
 
   @override
   void didUpdateWidget(covariant ResultsScreen oldWidget) {
-    foodList = [...widget.results];
+    updateState();
     super.didUpdateWidget(oldWidget);
+  }
+
+  void updateState() {
+
+    foodList = [...widget.results];
+
+    if (widget.screenType == ResultScreenType.manual) {
+      Future.delayed(const Duration(milliseconds: 200), () {
+      searchFood();
+    });
+    }
   }
 
   void _toggleSelection(ScannedFood food) {
@@ -174,9 +188,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String title;
+    String emptyMessage;
+    switch (widget.screenType) {
+      case ResultScreenType.scan:
+        title = "Scan Result";
+        emptyMessage = 'No foods found. You can manually add some.';
+        break;
+      case ResultScreenType.manual:
+        title = "Manual Log";
+        emptyMessage = 'Add some food to be logged.';
+        break;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Results', style: TextStyle(color: Colors.white)),
+        title: Text(title, style: const TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.blue,
         elevation: 0,
@@ -187,7 +214,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: foodList.isEmpty
-                  ? const Center(child: Text('No foods found. Add some.'))
+                  ? Center(child: Text(emptyMessage))
                   : ListView.builder(
                       itemCount: foodList.length,
                       itemBuilder: (context, index) {
@@ -251,19 +278,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
             onPressed: _addResult,
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  Colors.green, // Set the background color of the button
+                  Colors.blue, // Set the background color of the button
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
               textStyle:
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ), // Show dialog when pressed
             child: const Text("Add Selected Foods"),
           ),
+          const SizedBox(height: 16),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: searchFood,
-        backgroundColor: Colors.blueAccent,
-        child: const Icon(Icons.add),
+        backgroundColor: Colors.grey.shade200,
+        child: const Icon(Icons.search),
       ),
     );
   }

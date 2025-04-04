@@ -1,4 +1,5 @@
 import 'package:count_frontend/api/back_end_api.dart';
+import 'package:count_frontend/enums/screen_types.dart';
 import 'package:count_frontend/models/scanned_food.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -73,7 +74,7 @@ class ImagePickerHelper {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ResultsScreen(results: foodResults),
+            builder: (context) => ResultsScreen(results: foodResults, screenType: ResultScreenType.scan),
           ),
         );
       } else {

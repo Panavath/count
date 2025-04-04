@@ -1,0 +1,4 @@
+enum ResultScreenType {
+  scan,
+  manual;
+}

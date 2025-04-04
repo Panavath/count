@@ -65,7 +65,7 @@ class BackendApi {
 
       Response imageRes = await dio.post('$url/log/scan/', data: data);
       if (imageRes.statusCode == HttpStatus.notFound) {
-        return null;
+        return [];
       } else if (imageRes.statusCode == HttpStatus.ok) {
         List<Map<String, dynamic>> scannedFoods =
             castListDynamicToListMap(imageRes.data['foods']);

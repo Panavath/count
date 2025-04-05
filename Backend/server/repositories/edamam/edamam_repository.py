@@ -12,6 +12,7 @@ from schemas.yolo import BaseScannedFoodSchema
 from tables import EdamamCacheTable
 
 from other.utils import Log
+from other.exceptions import NoFoodEdamamException
 
 
 class EdamamRepository(BaseEdamamRepository):
@@ -62,7 +63,12 @@ class EdamamRepository(BaseEdamamRepository):
     def get_nutrition_info(self, scanned_food: BaseScannedFoodSchema) -> EdamamNutritionInfoSchema:
         data = self.get_nutrition_info_api(scanned_food.class_name)
 
-        food_data = data["hints"][0]["food"]
+        food_data_hints = data["hints"]
+
+        if food_data_hints == []:
+            raise NoFoodEdamamException
+
+        food_data = food_data_hints[0]["food"]
         label = food_data.get("label", "Unknown")
         nutrients = food_data.get("nutrients", {})
 

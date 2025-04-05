@@ -1,19 +1,15 @@
 class Goal {
-  final int id;
   final int userId;
-  final double? targetWeightKg;
-  final double? dailyCaloriesGoal;
-  final double? proteinGoalG;
-  final double? carbsGoalG;
-  final double? fatGoalG;
+  final double caloriesGoal;
+  final double proteinGoal;
+  final double carbsGoal;
+  final double fatGoal;
 
   Goal({
-    required this.id,
     required this.userId,
-    this.targetWeightKg,
-    this.dailyCaloriesGoal,
-    this.proteinGoalG,
-    this.carbsGoalG,
-    this.fatGoalG,
+    required this.caloriesGoal,
+    required this.proteinGoal,
+    required this.carbsGoal,
+    required this.fatGoal,
   });
 }

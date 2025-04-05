@@ -1,5 +1,6 @@
 import 'package:count_frontend/enums/screen_types.dart';
 import 'package:count_frontend/screens/food_input_result_screen.dart';
+import 'package:count_frontend/screens/goal_settings_screen.dart';
 import 'package:count_frontend/screens/scan_screen/scan_food_input.dart';
 import 'package:count_frontend/utility/config.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +25,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Food Selection App',
-        initialRoute: '/',
+        initialRoute: '/signup',
         routes: {
+          '/signup': (context) => GoalSettingScreen(),
           '/': (context) => const HomeScreen(),
           '/results': (context) => const ResultsScreen(
               results: [], screenType: ResultScreenType.manual),

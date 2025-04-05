@@ -11,8 +11,7 @@ class FoodLogCard extends StatefulWidget {
 }
 
 class _FoodLogCardState extends State<FoodLogCard> {
-  bool _isExpanded = false; // To track whether the card is expanded
-
+  bool _isExpanded = false; 
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -22,11 +21,11 @@ class _FoodLogCardState extends State<FoodLogCard> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.transparent, // Background color of the card
-          borderRadius: BorderRadius.circular(32), // Rounded corners
+          color: Colors.transparent, 
+          borderRadius: BorderRadius.circular(32), 
           border: Border.all(
             color: Colors.blueGrey.shade100,
-            width: 8, // Border width
+            width: 8, 
           ),
         ),
         child: Padding(
@@ -34,11 +33,10 @@ class _FoodLogCardState extends State<FoodLogCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Displaying the food name, meal type, and kcal in a row
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    _isExpanded = !_isExpanded; // Toggle the expanded state
+                    _isExpanded = !_isExpanded; 
                   });
                 },
                 child: Row(
@@ -47,14 +45,13 @@ class _FoodLogCardState extends State<FoodLogCard> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Food name
                         Text(
                           widget.foodLog.name,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
-                        // Meal Type
+                       
                         Text(
                           '${widget.foodLog.mealType.toString().split('.').last[0].toUpperCase() + widget.foodLog.mealType.toString().split('.').last.substring(1)}',
                           style: const TextStyle(
@@ -64,7 +61,7 @@ class _FoodLogCardState extends State<FoodLogCard> {
                         ),
                       ],
                     ),
-                    // Calories displayed on the trailing side
+                  
                     Row(
                       children: [
                         Text(
@@ -76,7 +73,7 @@ class _FoodLogCardState extends State<FoodLogCard> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        // Dropdown icon for expanding
+                       
                         Icon(
                           _isExpanded
                               ? Icons.expand_less
@@ -88,21 +85,16 @@ class _FoodLogCardState extends State<FoodLogCard> {
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
-
-              // If expanded, show additional details
-              if (_isExpanded) ...[
-                // Protein
+              const SizedBox(height: 8),  
+              if (_isExpanded) ...[  
                 Text(
                   'Protein: ${widget.foodLog.totalProtein.toStringAsFixed(1)} g',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
-                // Carbs
+                ),       
                 Text(
                   'Carbs: ${widget.foodLog.totalCarbs.toStringAsFixed(1)} g',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                 ),
-                // Fat
                 Text(
                   'Fat: ${widget.foodLog.totalFat.toStringAsFixed(1)} g',
                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),

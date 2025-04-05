@@ -210,18 +210,19 @@ class HomeScreen extends StatelessWidget {
     UserDataProvider provider = context.watch<UserDataProvider>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-              icon: Icon(HugeIcons.strokeRoundedUser), // Left icon
-              onPressed: () {
-                debugPrint("User clicked");
-              },
-            ),
+            // IconButton(
+            //   icon: Icon(HugeIcons.strokeRoundedUser), // Left icon
+            //   onPressed: () {
+            //     debugPrint("User clicked");
+            //   },
+            // ),
             const SizedBox(width: 50),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -232,13 +233,13 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 50),
-            IconButton(
-              highlightColor: Colors.black,
-              icon: const Icon(Icons.search, color: Colors.black), // Right icon
-              onPressed: () {
-                debugPrint("Search clicked");
-              },
-            ),
+            // IconButton(
+            //   highlightColor: Colors.black,
+            //   icon: const Icon(Icons.search, color: Colors.black), // Right icon
+            //   onPressed: () {
+            //     debugPrint("Search clicked");
+            //   },
+            // ),
           ],
         ),
       ),

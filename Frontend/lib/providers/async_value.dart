@@ -1,7 +1,7 @@
 enum AsyncValueState { none, loading, error, success, empty }
 
 class AsyncValue<T> {
-  final T? data;
+   T? data;
   final Object? error;
   final AsyncValueState state;
 

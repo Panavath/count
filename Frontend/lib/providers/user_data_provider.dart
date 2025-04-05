@@ -1,3 +1,4 @@
+import 'package:count_frontend/models/goal.dart';
 import 'package:count_frontend/models/scanned_food.dart';
 import 'package:count_frontend/models/user.dart';
 import 'package:count_frontend/providers/async_value.dart';
@@ -14,10 +15,77 @@ class UserDataProvider with ChangeNotifier {
   String? _imagePath;
   String? get imagePath => _imagePath;
 
+   Goal? userGoal;
+
+  UserDataProvider() {
+    logIn();
+  }
+
   void setImagePath(String path) {
     _imagePath = path;
     notifyListeners();
   }
+
+ void setUserGoal({
+    required double weight,
+    required double height,
+    required int age,
+    required String gender,
+    required String activityLevel,
+    required int currentUserId,
+  }) {
+    double bmr = calculateBMR(weight, height, age, gender);
+    double tdee = calculateTDEE(bmr, activityLevel);
+
+    // Now calculate the user's goal
+    double caloriesGoal = tdee;
+    double proteinGoal = (tdee * 0.30) / 4;
+    double carbGoal = (tdee * 0.40) / 4;
+    double fatGoal = (tdee * 0.30) / 9;
+
+    // Update the currentUser with the new goals
+    currentUser.data = User(
+      id: currentUser.data!.id,
+      username: currentUser.data!.username,
+      foodLogs: currentUser.data!.foodLogs,
+      heightCm: height,
+      weightKg: weight,
+      age: age,
+      gender: gender,
+      caloriesGoal: caloriesGoal,
+      proteinGoal: proteinGoal,
+      carbsGoal: carbGoal,
+      fatGoal: fatGoal,
+      activityLevel: activityLevel,
+    );
+
+    // Notify listeners to update the UI
+    notifyListeners();
+  }
+
+  // Calculate BMR
+  double calculateBMR(double weight, double height, int age, String gender) {
+    if (gender == 'male') {
+      return 10 * weight + 6.25 * height - 5 * age + 5;
+    } else {
+      return 10 * weight + 6.25 * height - 5 * age - 161;
+    }
+  }
+
+  // Calculate TDEE based on BMR and activity level
+  double calculateTDEE(double bmr, String activityLevel) {
+    double activityFactor = 1.55;
+    if (activityLevel == 'sedentary') {
+      activityFactor = 1.2;
+    } else if (activityLevel == 'lightly_active') {
+      activityFactor = 1.375;
+    } else if (activityLevel == 'very_active') {
+      activityFactor = 1.725;
+    }
+
+    return bmr * activityFactor;
+  }
+
 
   Future<void> logIn() async {
     currentUser = AsyncValue.loading();

@@ -12,8 +12,6 @@ log_router = CountRouter(prefix='/log', tags=['log'])
 
 @log_router.post('/food/')
 async def post_log_food(food: FoodLogCreationSchema, user_id: int = Query(...)):
-    Log.print_debug(user_id)
-    Log.print_debug(food)
     try:
         _ = DatabaseService.get_user_by_id(user_id)
     except DoesNotExistException as e:
@@ -21,6 +19,15 @@ async def post_log_food(food: FoodLogCreationSchema, user_id: int = Query(...)):
 
     new_log = DatabaseService.add_food_log(user_id, food)
     return new_log
+
+@log_router.delete('/food/')
+async def delete_log_food(log_id: int = Query(...)):
+    try:
+        rows_deleted = DatabaseService.delete_food_log(log_id)
+    except DoesNotExistException as e:
+        raise HTTPException(404, e.args[0])
+
+    return {'status': 'success', 'rows': rows_deleted}
 
 
 @log_router.post('/scan/')

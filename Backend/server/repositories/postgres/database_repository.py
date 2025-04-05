@@ -1,8 +1,8 @@
 import atexit
-from typing import Iterable
+from typing import Iterable, Literal
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 
 from tables import *
 from schemas import *
@@ -30,14 +30,42 @@ class BaseDBRepository:
             self.session.rollback()
             raise e
 
-    def create_user(self, user_name: str) -> UserSchema:
-        new_user = UserTable(user_name=user_name, food_logs=[])
+    def create_user(
+        self,    *,
+        user_name: str,
+        dob: datetime,
+        gender: Literal['male', 'female'],
+        height: float,
+        weight: float,
+        height_goal: float | None,
+        weight_goal: float | None,
+        calory_goal: float | None,
+    ) -> UserSchema:
+        if height_goal is not None and height_goal <= 0:
+            height_goal = None
+        if weight_goal is not None and weight_goal <= 0:
+            weight_goal = None
+        if calory_goal is not None and calory_goal <= 0:
+            calory_goal = None
+        new_user = UserTable(
+            user_name=user_name,
+            dob=dob,
+            gender=gender,
+            height=height,
+            weight=weight,
+            height_goal=height_goal,
+            weight_goal=weight_goal,
+            calory_goal=calory_goal,
+            food_logs=[],
+            weight_logs=[],
+            height_logs=[],
+        )
 
         self.__add_commit_refresh(new_user)
-        return UserDTO.from_table_to_schema(new_user)
+        return UserDto.from_table_to_schema(new_user)
 
     def get_user_schema_by_id(self, user_id: int) -> UserSchema:
-        return UserDTO.from_table_to_schema(self.get_user_table_by_id(user_id))
+        return UserDto.from_table_to_schema(self.get_user_table_by_id(user_id))
 
     def get_user_table_by_id(self, user_id: int) -> UserTable:
         result = self.session.query(UserTable).where(
@@ -63,12 +91,20 @@ class BaseDBRepository:
         user.food_logs.append(new_food_log)
         self.__add_commit_refresh(new_food_log)
 
-        return UserDTO.from_table_to_schema(user)
+        return UserDto.from_table_to_schema(user)
+
+    def delete_food_log(self, log_id: int) -> int:
+        stmt = delete(FoodLogTable).where(FoodLogTable.food_log_id == log_id)
+        result = self.session.execute(stmt)
+        self.session.commit()
+
+        return result.rowcount
+
 
     def get_all_users(self) -> list[UserSchema]:
         users = self.session.query(UserTable).all()
 
-        return [UserDTO.from_table_to_schema(user) for user in users]
+        return [UserDto.from_table_to_schema(user) for user in users]
 
     # def get_all(self) -> Sequence[SchemaType]: ...
 
@@ -76,5 +112,9 @@ class BaseDBRepository:
 
     # def update(self, obj_id: int, **kwargs) -> SchemaType | None: ...
 
-    def delete(self, obj_id: int) -> bool: ...
+    def delete_user(self, user_id: int) -> int:
+        stmt = delete(UserTable).where(UserTable.user_id == user_id)
+        result = self.session.execute(stmt)
+        self.session.commit()
 
+        return result.rowcount

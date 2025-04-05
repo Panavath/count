@@ -69,19 +69,19 @@
 
 ```json
 {
-  "user_id": int,
-  "user_name": str,
-  "dob": str, // DateTime in string format
-  "gender": str, // 'male' or 'female'
-  "height": float, // PositiveFloat
-  "weight": float, // PositiveFloat
-  "register_date": str, // DateTime in string format
-  "height_goal": float | null,
-  "weight_goal": float | null,
-  "calory_goal": float | null,
-  "height_logs": [HeightLogSchema],
-  "weight_logs": [WeightLogSchema],
-  "food_logs": [FoodLogSchema],
+  "user_id": "int",
+  "user_name": "str",
+  "dob": "str", // DateTime in string format
+  "gender": "str", // 'male' or 'female'
+  "height": "float", // PositiveFloat
+  "weight": "float", // PositiveFloat
+  "register_date": "str", // DateTime in string format
+  "height_goal": "float or null",
+  "weight_goal": "float or null",
+  "calory_goal": "float or null",
+  "height_logs": ["HeightLogSchema"],
+  "weight_logs": ["WeightLogSchema"],
+  "food_logs": ["FoodLogSchema"],
 }
 ```
 
@@ -89,14 +89,14 @@
 
 ```json
 {
-  "user_name": str,
-  "dob": str, // DateTime in string format
-  "gender": str, // 'male' or 'female'
-  "height": float, // PositiveFloat
-  "weight": float, // PositiveFloat
-  "height_goal": float | null,
-  "weight_goal": float | null,
-  "calory_goal": float | null,
+  "user_name": "str",
+  "dob": "str", // DateTime in string format
+  "gender": "str", // 'male' or 'female'
+  "height": "float", // PositiveFloat
+  "weight": "float", // PositiveFloat
+  "height_goal": "float or null",
+  "weight_goal": "float or null",
+  "calory_goal": "float or null",
 }
 ```
 
@@ -104,11 +104,11 @@
 
 ```json
 {
-  "food_log_id": int,
-  "name": str,
-  "meal_type": str, // Enum
-  "date": str, // DateTime in string format
-  "foods": [FoodSchema]
+  "food_log_id": "int",
+  "name": "str",
+  "meal_type": "str", // Enum
+  "date": "str", // DateTime in string format
+  "foods": ["FoodSchema"]
 }
 ```
 
@@ -116,9 +116,9 @@
 
 ```json
 {
-  "weight_log_id": int,
-  "weight": float,
-  "date": str, // DateTime in string format
+  "weight_log_id": "int",
+  "weight": "float",
+  "date": "str", // DateTime in string format
 }
 ```
 
@@ -126,9 +126,9 @@
 
 ```json
 {
-  "height_log_id": int,
-  "height": float,
-  "date": str, // DateTime in string format
+  "height_log_id": "int",
+  "height": "float",
+  "date": "str", // DateTime in string format
 }
 ```
 
@@ -136,10 +136,10 @@
 
 ```json
 {
-  "name": str,
-  "meal_type": str, // Enum
-  "date": str, // DateTime in string format
-  "foods": [FoodCreationSchema]
+  "name": "str",
+  "meal_type": "str", // Enum
+  "date": "str", // DateTime in string format
+  "foods": ["FoodCreationSchema"]
 }
 ```
 
@@ -147,13 +147,13 @@
 
 ```json
 {
-  "name": str,
-  "serving_size": float,
-  "unit": str, // Not used for now
-  "calories": float,
-  "protein_g": float,
-  "carbs_g": float,
-  "fat_g": float
+  "name": "str",
+  "serving_size": "float",
+  "unit": "str", // Not used for now
+  "calories": "float",
+  "protein_g": "float",
+  "carbs_g": "float",
+  "fat_g": "float"
 }
 ```
 
@@ -161,14 +161,14 @@
 
 ```json
 {
-  "food_id": int,
-  "name": str,
-  "serving_size": float,
-  "unit": str, // Not used for now
-  "calories": float,
-  "protein_g": float,
-  "carbs_g": float,
-  "fat_g": float
+  "food_id": "int",
+  "name": "str",
+  "serving_size": "float",
+  "unit": "str", // Not used for now
+  "calories": "float",
+  "protein_g": "float",
+  "carbs_g": "float",
+  "fat_g": "float"
 }
 ```
 
@@ -176,10 +176,10 @@
 
 ```json
 {
-  "class_name": str, // Aka. food name
-  "confidence": float, // A value from 0.0 to 1.0, higher means more confidence
-  "bbox": [int], // Should be ignored
-  "nutrition_info": EdamamNutritionInfoSchema
+  "class_name": "str", // Aka. food name
+  "confidence": "float", // A value from 0.0 to 1.0, higher means more confidence
+  "bbox": ["int"], // Should be ignored
+  "nutrition_info": "EdamamNutritionInfoSchema"
 }
 ```
 
@@ -187,10 +187,10 @@
 
 ```json
 {
-  "description": str, // aka. food name or class name
-  "calories": float,
-  "protein_g": float,
-  "carbs_g": float,
-  "fat_g": float
+  "description": "str", // aka. food name or class name
+  "calories": "float",
+  "protein_g": "float",
+  "carbs_g": "float",
+  "fat_g": "float"
 }
 ```

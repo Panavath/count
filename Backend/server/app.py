@@ -8,10 +8,11 @@ from repositories import *
 from database.database import create_tables
 
 app = FastAPI()
-EdamamService.initialize(EdamamRepository())
+edamam_repo = EdamamRepository()
+EdamamService.initialize(edamam_repo)
 YoloService.initialize("UECFood256.pt")
 DatabaseService.initialize(db_repo=BaseDBRepository())
-SearchService.initialize(CacheSearchRepo())
+SearchService.initialize(CacheSearchRepo(), edamam_repo)
 
 
 @app.get('/')

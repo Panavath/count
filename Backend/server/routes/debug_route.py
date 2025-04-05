@@ -1,6 +1,6 @@
 from services import DatabaseService
 from . import CountRouter
-from typing import Callable
+from datetime import datetime
 
 from fastapi import HTTPException, Depends
 
@@ -30,14 +30,21 @@ async def create_tables_route():
 async def seed_tables_route():
     if ENV_MODE != 'DEV':
         raise HTTPException(405, 'Operation not allowed')
-    DatabaseService.new_user('Hout Manut')
+    DatabaseService.new_user(
+        user_name='Hout Manut',
+        dob=datetime(2004, 7, 6),
+        gender='male',
+        height=165,
+        weight=50,
+    )
+
     return {'message': 'Tables seeded successfully'}
 
-@debug_router.get('/reset')
-async def reset_db_route():
-    if ENV_MODE != 'DEV':
-        raise HTTPException(405, 'Operation not allowed')
-    drop_all_tables()
-    create_tables()
-    DatabaseService.new_user('Hout Manut')
-    return 200
+# @debug_router.get('/reset')
+# async def reset_db_route():
+#     if ENV_MODE != 'DEV':
+#         raise HTTPException(405, 'Operation not allowed')
+#     drop_all_tables()
+#     create_tables()
+#     DatabaseService.new_user('Hout Manut')
+#     return 200

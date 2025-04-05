@@ -14,6 +14,10 @@ class UserDataProvider with ChangeNotifier {
   String? _imagePath;
   String? get imagePath => _imagePath;
 
+  UserDataProvider() {
+    logIn();
+  }
+
   void setImagePath(String path) {
     _imagePath = path;
     notifyListeners();

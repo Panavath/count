@@ -18,8 +18,7 @@ class FoodLogTable(BaseTable):
     __tablename__ = 'FoodLog'
 
     # Columns
-    food_log_id: Mapped[int] = mapped_column(
-        primary_key=True, index=True, autoincrement=True)
+    food_log_id: Mapped[int] = mapped_column(primary_key=True, index=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('User.user_id'))
     name: Mapped[str]
     meal_type: Mapped[MealType]

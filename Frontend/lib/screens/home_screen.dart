@@ -1,8 +1,13 @@
+import 'package:count_frontend/models/food_log.dart';
+import 'package:count_frontend/screens/date_label.dart';
+import 'package:count_frontend/screens/home_screen_2.dart';
+import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart'; // Import your custom icons
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:count_frontend/models/user.dart';
 import 'package:count_frontend/providers/async_value.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/user_data_provider.dart'; // Import the state management class
+import 'package:count_frontend/providers/user_data_provider.dart'; // Import the state management class
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -12,17 +17,63 @@ class HomeScreen extends StatelessWidget {
         context: context, builder: (context) => _RegisterModal());
   }
 
+  Widget buildCardWithBorder({
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color iconBackgroundColor,
+    required double iconSize,
+    required double cardWidth,
+    required double cardHeight,
+    required Color borderColor,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: borderColor,
+          width: 10,
+        ),
+      ),
+      child: InfoCardSmall(
+        label: label,
+        iconBackgroundColor: iconBackgroundColor,
+        value: value,
+        icon: icon,
+        iconSize: iconSize,
+        cardWidth: cardWidth,
+        cardHeight: cardHeight,
+      ),
+    );
+  }
+
+  Map<String, List<FoodLog>> groupFoodLogsByDate(List<FoodLog> foodLogs) {
+    Map<String, List<FoodLog>> groupedLogs = {};
+
+    for (var log in foodLogs) {
+      String dateLabel =
+          formatDate(log.date); // Format the date (use DateFormat as required)
+      groupedLogs.putIfAbsent(dateLabel, () => []).add(log);
+    }
+
+    return groupedLogs;
+  }
+
+  String formatDate(DateTime dateTime) {
+    final DateFormat formatter = DateFormat('MMMM dd, yyyy');
+    return formatter.format(dateTime);
+  }
+
   Widget buildBody(BuildContext context, UserDataProvider provider) {
     switch (provider.currentUser.state) {
       case AsyncValueState.none:
         provider.logIn();
-        return const Center(
-          child: Text('Loading user data...'),
-        );
+        return const Center(child: Text('Loading user data...'));
+
       case AsyncValueState.loading:
-        return const Center(
-          child: Text('Loading user data...'),
-        );
+        return const Center(child: Text('Loading user data...'));
+
       case AsyncValueState.error:
         return Center(
           child: Column(
@@ -34,52 +85,114 @@ class HomeScreen extends StatelessWidget {
                   register(context);
                 },
                 child: const Text('Re-Register'),
-              )
+              ),
             ],
           ),
         );
+
       case AsyncValueState.success:
-        return ListView.builder(
-            itemCount: provider.currentUser.data!.foodLogs.length,
-            itemBuilder: (context, index) {
-              User user = provider.currentUser.data!;
-              final foodLog = user.foodLogs[index];
+        User user = provider.currentUser.data!; // Get the current user data
+        final foodLog = user.foodLogs.isNotEmpty ? user.foodLogs[0] : null;
 
-              final foodName = foodLog.name;
-              final foodCalories = foodLog.totalCalories;
-              final foodProtein = foodLog.totalProtein;
-              final foodCarbs = foodLog.totalCarbs;
-              final foodFat = foodLog.totalFat;
+        final groupedLogs = groupFoodLogsByDate(user.foodLogs);
 
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                elevation: 5, // Enhanced elevation for better shadow effect
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  // leading: CircleAvatar(
-                  //   backgroundImage: provider.imagePath != null
-                  //       ? FileImage(File(provider
-                  //           .imagePath!)) // Use image path from the provider
-                  //       : const AssetImage('assets/default_image.png')
-                  //           as ImageProvider,
-                  //   radius: 30,
-                  // ),
-                  title: Text(foodName,
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                  subtitle: Text(
-                    'Calories: $foodCalories kcal\n'
-                    'Protein: ${foodProtein}g\n'
-                    'Carbs: ${foodCarbs}g\n'
-                    'Fat: ${foodFat}g',
-                    style: const TextStyle(fontSize: 14, color: Colors.black),
-                  ),
-                  trailing: const Icon(Icons.more_vert, color: Colors.grey),
+       double totalCalories = FoodLog.getTotalCalories(user.foodLogs);
+       double totalProtein = FoodLog.getTotalProtein(user.foodLogs);
+       double totalFat = FoodLog.getTotalFat(user.foodLogs);
+       double totalCarbs = FoodLog.getTotalCarb(user.foodLogs);
+
+
+        return Column(
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("Today",
+                      textScaler: TextScaler.linear(1),
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent, // Background color of the card
+                borderRadius: BorderRadius.circular(32), // Rounded corners
+                border: Border.all(
+                  color: Colors.blueGrey.shade100,
+                  width: 8, // Border width
                 ),
-              );
-            });
+              ),
+              child: InfoCard(
+                label: 'CALORIES',
+                iconBackgroundColor: Colors.orange.shade300,
+                value: foodLog != null
+                    ? "${totalCalories} kcal"
+                    : "0 kcal",
+                icon: HugeIcons.strokeRoundedFire03,
+                iconSize: 100,
+                cardWidth: MediaQuery.of(context).size.width * 0.85,
+                cardHeight: 110,
+              ),
+            ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // Using the new method to create the small cards with borders
+                buildCardWithBorder(
+                  label: 'PROTEIN',
+                  value:"${totalProtein > 0 ? totalProtein.toStringAsFixed(1) : '0'} g",
+                  icon: HugeIcons.strokeRoundedSteak,
+                  iconBackgroundColor: Colors.red.shade300,
+                  iconSize: 32,
+                  cardWidth: MediaQuery.of(context).size.width * 0.25,
+                  cardHeight: 125,
+                  borderColor: Colors.blueGrey.shade100, // Grey border color
+                ),
+                buildCardWithBorder(
+                  label: 'CARBS',
+                  value: "${totalCarbs > 0 ? totalCarbs.toStringAsFixed(1) : '0'} g",
+                  icon: HugeIcons.strokeRoundedRiceBowl01,
+                  iconBackgroundColor: Colors.green.shade300,
+                  iconSize: 32,
+                  cardWidth: MediaQuery.of(context).size.width * 0.25,
+                  cardHeight: 125,
+                  borderColor: Colors.blueGrey.shade100, // Grey border color
+                ),
+                buildCardWithBorder(
+                  label: 'FAT',
+                  value: "${totalFat > 0 ? totalFat.toStringAsFixed(1) : '0'} g",
+                  icon: HugeIcons.strokeRoundedFrenchFries01,
+                  iconBackgroundColor: Colors.yellow.shade300,
+                  iconSize: 32,
+                  cardWidth: MediaQuery.of(context).size.width * 0.25,
+                  cardHeight: 125,
+                  borderColor: Colors.blueGrey.shade100, // Grey border color
+                ),
+              ],
+            ),
+          
+            ListView.builder(
+               physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+                itemCount: groupedLogs.length,
+                itemBuilder: (context, index) {
+                  String dateLabel = groupedLogs.keys.elementAt(index);
+                  List<FoodLog> logsForDate = groupedLogs[dateLabel]!;
+                  return DateLog(
+                    dateLabel: dateLabel,
+                    logsForDate: logsForDate,
+                  );
+                },
+              ),
+          ],
+        );
+
       case AsyncValueState.empty:
         return Center(
           child: ElevatedButton(
@@ -98,50 +211,68 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Food Log',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.blueAccent,
-        elevation: 5,
+        backgroundColor: Colors.white,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              // Search functionality can be added here
-              debugPrint("Search clicked");
-            },
-          )
-        ],
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(HugeIcons.strokeRoundedUser), // Left icon
+              onPressed: () {
+                debugPrint("User clicked");
+              },
+            ),
+            const SizedBox(width: 50),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                'assets/icon/Count.png',
+                fit: BoxFit.contain,
+                height: 50,
+              ),
+            ),
+            const SizedBox(width: 50),
+            IconButton(
+              highlightColor: Colors.black,
+              icon: const Icon(Icons.search, color: Colors.black), // Right icon
+              onPressed: () {
+                debugPrint("Search clicked");
+              },
+            ),
+          ],
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: buildBody(context, provider),
+      body: SingleChildScrollView(
+        
+        child: Container(
+          decoration: BoxDecoration(color: Colors.white),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: buildBody(context, provider),
+          ),
+        ),
       ),
       floatingActionButton:
           provider.currentUser.state == AsyncValueState.success
               ? Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // Add the button for navigating to the ResultsScreen
                     FloatingActionButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/results');
                       },
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.blue.shade300,
                       heroTag: null,
-                      child: const Icon(
-                          Icons.add), // Required to avoid duplicate hero tags
+                      child: const Icon(Icons.add),
                     ),
                     const SizedBox(height: 16),
-                    // Add the button for navigating to the ScanScreen
                     FloatingActionButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/scan');
                       },
-                      backgroundColor: Colors.blueAccent,
+                      backgroundColor: Colors.blue.shade300,
                       heroTag: null,
-                      child: const Icon(Icons
-                          .camera_alt), // Required to avoid duplicate hero tags
+                      child: const Icon(Icons.camera_alt),
                     ),
                   ],
                 )
@@ -190,9 +321,9 @@ class _RegisterModalState extends State<_RegisterModal> {
                 width: 200,
                 child: ElevatedButton(
                     onPressed: onAdd, child: const Text('Register')),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

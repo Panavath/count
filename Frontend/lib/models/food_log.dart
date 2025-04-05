@@ -21,7 +21,9 @@ class FoodLog {
     for (Food food in foods) {
       calories += food.calories;
     }
+    // print(calories);
     return calories;
+    
   }
 
   double get totalProtein {
@@ -47,4 +49,34 @@ class FoodLog {
     }
     return fat;
   }
+
+  static double getTotalCalories(List<FoodLog> foodLogs) {
+  double totalCalories = 0;
+  for (var log in foodLogs) {
+    totalCalories += log.totalCalories; 
+  }
+  return totalCalories;
+}
+  static double getTotalProtein(List<FoodLog> foodLogs) {
+  double totalProtein = 0;
+  for (var log in foodLogs) {
+    totalProtein += log.totalProtein; 
+  }
+  return totalProtein;
+}
+  static double getTotalFat(List<FoodLog> foodLogs) {
+  double totalFat = 0;
+  for (var log in foodLogs) {
+    totalFat += log.totalFat; 
+  }
+  return totalFat;
+}
+  static double getTotalCarb(List<FoodLog> foodLogs) {
+  double totalCarb = 0;
+  for (var log in foodLogs) {
+    totalCarb += log.totalCarbs; 
+  }
+  return totalCarb;
+}
+
 }

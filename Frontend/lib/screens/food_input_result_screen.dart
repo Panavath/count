@@ -9,6 +9,7 @@ import 'package:count_frontend/providers/async_value.dart';
 import 'package:count_frontend/providers/user_data_provider.dart';
 import 'package:count_frontend/utility/app_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ResultsScreen extends StatefulWidget {
@@ -39,13 +40,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   void updateState() {
-
     foodList = [...widget.results];
 
     if (widget.screenType == ResultScreenType.manual) {
       Future.delayed(const Duration(milliseconds: 200), () {
-      searchFood();
-    });
+        searchFood();
+      });
     }
   }
 
@@ -95,10 +95,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   final TextEditingController foodNameController = TextEditingController();
-  // Show dialog for food name and meal type input
-  Future<void> _showFoodInputDialog() async {
+  final TextEditingController dateController =
+      TextEditingController(); // Date controller
+
+// Show dialog for food name, meal type input, and date picker
+  Future<void> _showFoodInputDialog(BuildContext context) async {
     foodNameController.text = '';
     String selectedMealType = 'Breakfast'; // Default value for meal type
+    DateTime selectedDate = DateTime.now(); // Default to current date
 
     return showDialog<void>(
       context: context,
@@ -112,11 +116,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  // Food name input field
                   TextField(
                     controller: foodNameController,
                     decoration: const InputDecoration(labelText: 'Meal Name'),
                   ),
                   const SizedBox(height: 10),
+
+                  // Meal type dropdown
                   DropdownButton<String>(
                     isExpanded: true,
                     value: selectedMealType,
@@ -134,38 +141,70 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       );
                     }).toList(),
                   ),
+                  const SizedBox(height: 10),
+
+                  // Date input field with DatePicker
+                  TextField(
+                    controller: dateController,
+                    decoration: const InputDecoration(
+                      labelText: 'Select Date',
+                      hintText: 'Select date',
+                    ),
+                    readOnly: true, // Prevent direct input
+                    onTap: () async {
+                      // Show date picker when user taps on the text field
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
+                      );
+
+                      if (pickedDate != null && pickedDate != selectedDate) {
+                        setState(() {
+                          selectedDate = pickedDate;
+                          dateController.text =
+                              DateFormat('yyyy-MM-dd').format(selectedDate);
+                        });
+                      }
+                    },
+                  ),
                 ],
               );
             },
           ),
           actions: <Widget>[
-            AppButton.primaryButton(
+            // Save button
+            ElevatedButton(
               onPressed: () {
                 String foodName = foodNameController.text.isNotEmpty
                     ? foodNameController.text
                     : 'Unknown Food';
 
+                // You can pass the selected date here
                 List<ScannedFood> selectedFoods = selectedItems.toList();
 
-                // Send the selected foods to the backend via UserDataProvider
+                // Send the selected foods and the selected date to the backend
                 Provider.of<UserDataProvider>(context, listen: false).newLog(
-                    name: foodName,
-                    date: DateTime.now(),
-                    mealTypeString: selectedMealType,
-                    foods: selectedFoods);
+                  name: foodName,
+                  date: selectedDate, // Use selected date here
+                  mealTypeString: selectedMealType,
+                  foods: selectedFoods,
+                );
 
                 // Close the dialog
                 Navigator.of(context).pop();
-                // Navigate back to home screen after saving
                 Navigator.popUntil(context, ModalRoute.withName('/'));
               },
-              text: 'Save',
+              child: const Text('Save'),
             ),
-            AppButton.secondaryButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                text: 'Cancel'),
+            // Cancel button
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
           ],
         );
       },
@@ -182,8 +221,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
       return;
     }
 
-    // Show dialog for user to enter food name and meal type
-    _showFoodInputDialog();
+    _showFoodInputDialog(context);
   }
 
   @override
@@ -280,10 +318,15 @@ class _ResultsScreenState extends State<ResultsScreen> {
               backgroundColor:
                   Colors.blue, // Set the background color of the button
               padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-              textStyle:
-                  const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ), // Show dialog when pressed
-            child: const Text("Add Selected Foods"),
+            child: const Text(
+              "Add Selected Foods",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           const SizedBox(height: 16),
         ],

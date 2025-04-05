@@ -16,7 +16,7 @@ class FoodTable(BaseTable):
     # Columns
     food_id: Mapped[int] = mapped_column(
         primary_key=True, index=True, autoincrement=True)
-    food_log_id: Mapped[int] = mapped_column(ForeignKey('FoodLog.food_log_id'))
+    food_log_id: Mapped[int] = mapped_column(ForeignKey('FoodLog.food_log_id', ondelete='CASCADE'))
     name: Mapped[str] = mapped_column(nullable=False)
     serving_size: Mapped[float] = mapped_column(nullable=False)
     unit: Mapped[str] = mapped_column(nullable=False)

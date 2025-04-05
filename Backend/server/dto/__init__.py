@@ -6,21 +6,35 @@ from schemas import *
 from tables import *
 
 
-class UserDTO:
+class UserDto:
     @staticmethod
     def from_table_to_schema(data: UserTable) -> UserSchema:
         logs: list[FoodLogSchema] = []
         for food_log_table in data.food_logs:
-            logs.append(FoodLogDTO.from_table_to_schema(food_log_table))
+            logs.append(FoodLogDto.from_table_to_schema(food_log_table))
 
         return UserSchema(
             user_id=data.user_id,
             user_name=data.user_name,
+            dob=data.dob,
+            height=data.height,
+            calory_goal=data.calory_goal,
+            gender=data.gender,
+            height_goal=data.height_goal,
+            height_logs=[HeightLogDto.from_table_to_schema(
+                x) for x in data.height_logs
+            ],
+            register_date=data.register_date,
+            weight=data.weight,
+            weight_goal=data.weight_goal,
+            weight_logs=[WeightLogDto.from_table_to_schema(
+                x) for x in data.weight_logs
+            ],
             food_logs=logs
         )
 
 
-class FoodLogDTO:
+class FoodLogDto:
     @staticmethod
     def from_table_to_schema(data: FoodLogTable) -> FoodLogSchema:
         foods: list[FoodSchema] = []
@@ -50,6 +64,37 @@ class FoodLogDTO:
             foods=foods,
         )
 
+
+class WeightLogDto:
+    @staticmethod
+    def from_table_to_schema(data: WeightLogTable) -> WeightLogSchema:
+        return WeightLogSchema(
+            weight=data.weight,
+            date=data.date,
+        )
+
+    @staticmethod
+    def from_schema_to_table(data: WeightLogSchema) -> WeightLogTable:
+        return WeightLogTable(
+            weight=data.weight,
+            date=data.date,
+        )
+
+
+class HeightLogDto:
+    @staticmethod
+    def from_table_to_schema(data: HeightLogTable) -> HeightLogSchema:
+        return HeightLogSchema(
+            height=data.height,
+            date=data.date,
+        )
+
+    @staticmethod
+    def from_schema_to_table(data: HeightLogSchema) -> HeightLogTable:
+        return HeightLogTable(
+            height=data.height,
+            date=data.date,
+        )
 
 
 @dataclass
@@ -100,7 +145,7 @@ class FoodDTO:
             data.protein_g > 0,
             data.carbs_g > 0,
             data.fat_g > 0,
-            ]):
+        ]):
             values_calculated = True
 
         return FoodTable(
@@ -117,7 +162,7 @@ class FoodDTO:
 
 
 __all__ = [
-    'UserDTO',
+    'UserDto',
     'FoodDTO',
     'FoodDTO',
 ]

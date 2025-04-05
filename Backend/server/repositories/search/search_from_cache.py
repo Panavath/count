@@ -21,23 +21,25 @@ class CacheSearchRepo(BaseSearchRepo):
         self._cache.clear()
 
         for data_table in cached_data:
-            cache = json.loads(data_table.value)['hints']
+            cache = json.loads(data_table.value).get('hints', None)
             if cache:
-                food_data: dict[str, Any] = cache[0][
-                    'food'
-                ]
-                label: str = food_data.get('label', 'unknown')
-                nutrients = food_data.get("nutrients", {})
+                for food in cache:
+                    food_data: dict[str, Any] = food[
+                        'food'
+                    ]
+                    label: str = food_data.get('label', 'unknown')
+                    nutrients = food_data.get("nutrients", {})
 
-                self._cache.append(
-                    EdamamNutritionInfoSchema(
-                        description=label,
-                        calories=round(nutrients.get("ENERC_KCAL", 0.0), 2),
-                        protein_g=round(nutrients.get("PROCNT", 0.0), 2),
-                        carbs_g=round(nutrients.get("CHOCDF", 0.0), 2),
-                        fat_g=round(nutrients.get("FAT", 0.0), 2),
+                    self._cache.append(
+                        EdamamNutritionInfoSchema(
+                            description=label,
+                            calories=round(nutrients.get("ENERC_KCAL", 0.0), 2),
+                            protein_g=round(nutrients.get("PROCNT", 0.0), 2),
+                            carbs_g=round(nutrients.get("CHOCDF", 0.0), 2),
+                            fat_g=round(nutrients.get("FAT", 0.0), 2),
+                        )
                     )
-                )
+
 
     def search_food(self, query: str) -> list[EdamamNutritionInfoSchema]:
         self.update_cache()

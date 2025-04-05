@@ -11,7 +11,7 @@ from schemas.edamam import EdamamNutritionInfoSchema
 from schemas.yolo import BaseScannedFoodSchema
 from tables import EdamamCacheTable
 
-from other.utils import Log
+from other.utils import Log, Path
 from other.exceptions import NoFoodEdamamException
 
 
@@ -52,6 +52,7 @@ class EdamamRepository(BaseEdamamRepository):
             )
 
         data = response.content.decode()
+        Path.save_cache_json('test.json', json.loads(data))
         if "hints" not in data:
             raise RuntimeError(f"No food items found for '{ingr}'.")
         new_cache = EdamamCacheTable(key=ingr, value=data)

@@ -5,10 +5,12 @@ class User {
   final int id;
   final String username;
   final String? gender;
-  final int? age;
+
+  final DateTime? dob;
   final List<FoodLog> foodLogs;
   final double? heightCm;
   final double? weightKg;
+  final double? weightGoal;
   final double? caloriesGoal;
   final double? proteinGoal;
   final double? carbsGoal;
@@ -22,14 +24,27 @@ class User {
       required this.foodLogs,
       this.caloriesGoal,
       this.gender,
+      this.dob,
+      this.weightGoal,
       this.heightCm,
-      this.age,
       this.proteinGoal,
       this.carbsGoal,
       this.createdAt,
       this.fatGoal,
       this.activityLevel,
       this.weightKg});
+
+    int get age {
+    if (dob == null) {
+      return 0;
+    }
+    DateTime today = DateTime.now();
+    int yearsDifference = today.year - dob!.year;
+    if (today.month < dob!.month || (today.month == dob!.month && today.day < dob!.day)) {
+      yearsDifference--;
+    }
+    return yearsDifference;
+  }
 
   // Calculate BMR
   double calculateBMR() {

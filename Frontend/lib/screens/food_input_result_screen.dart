@@ -16,8 +16,7 @@ class ResultsScreen extends StatefulWidget {
   final List<ScannedFood> results;
   final ResultScreenType screenType;
 
-  const ResultsScreen(
-      {super.key, required this.results, required this.screenType});
+  const ResultsScreen({super.key, required this.results, required this.screenType});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
@@ -95,10 +94,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   final TextEditingController foodNameController = TextEditingController();
-  final TextEditingController dateController =
-      TextEditingController(); // Date controller
+  final TextEditingController dateController = TextEditingController(); // Date controller
 
-// Show dialog for food name, meal type input, and date picker
+  // Show dialog for food name, meal type input, and date picker
   Future<void> _showFoodInputDialog(BuildContext context) async {
     foodNameController.text = '';
     String selectedMealType = 'Breakfast'; // Default value for meal type
@@ -192,6 +190,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   foods: selectedFoods,
                 );
 
+                // Show confirmation dialog
+                _showConfirmationDialog();
+
                 // Close the dialog
                 Navigator.of(context).pop();
                 Navigator.popUntil(context, ModalRoute.withName('/'));
@@ -204,6 +205,28 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Confirmation dialog after successfully saving the food log
+  Future<void> _showConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Success'),
+          content: const Text('The food log has been saved successfully!'),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the confirmation dialog
+              },
+              child: const Text('OK'),
             ),
           ],
         );
@@ -240,6 +263,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(title, style: const TextStyle(color: Colors.white)),
         centerTitle: true,
@@ -339,6 +363,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     );
   }
 }
+
 
 class SearchWidget extends StatefulWidget {
   const SearchWidget({

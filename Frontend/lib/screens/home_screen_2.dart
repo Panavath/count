@@ -1,201 +1,219 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Import the flutter_svg package
 
-class InfoCard extends StatelessWidget {
+import 'package:flutter/material.dart';
+
+class ProgressInfoCard extends StatelessWidget {
   final String label;
-  final String value; // Value is now a double
-  // final String svgAssetPath;
+  final double currentValue;
+  final double targetValue;
   final IconData icon;
-  final Color iconBackgroundColor;
+  final Color iconColor;
+  final Color progressColor;
+  final Color progressBackgroundColor;
   final Color valueColor;
   final Color labelColor;
   final double cardWidth;
   final double cardHeight;
-  final double iconSize;
-  // final String imageUrl;
+  final double indicatorSize;
 
-  InfoCard({
+  const ProgressInfoCard({
+    Key? key,
     required this.icon,
     required this.label,
-    required this.value, // Now accepts double for value
-    // required this.svgAssetPath,
-    this.iconBackgroundColor =
-        Colors.transparent, // Default icon background color
+    required this.currentValue,
+    required this.targetValue,
+    this.iconColor = Colors.black,
+    this.progressColor = Colors.blue,
+    this.progressBackgroundColor = Colors.grey,
     this.valueColor = Colors.black,
-    this.labelColor = Colors.blueGrey, // Default text color
-    this.cardWidth = 200.0, // Default width of the card
-    this.cardHeight = 150.0, // Default height of the card
-    this.iconSize = 50.0,
-    // required this.imageUrl,
-  });
+    this.labelColor = Colors.blueGrey,
+    this.cardWidth = 200.0,
+    this.cardHeight = 150.0,
+    this.indicatorSize = 80.0,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Ensure we don't divide by zero and properly convert to double
+    final double progress = targetValue > 0 
+        ? (currentValue / targetValue).clamp(0.0, 1.0).toDouble()
+        : 0.0;
+    
+    final String progressPercentage = (progress * 100).toStringAsFixed(1);
+
     return Container(
       width: cardWidth,
       height: cardHeight,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        // border: Border.all(color: Colors.black),
         color: Colors.white,
         borderRadius: BorderRadius.circular(32),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // SVG Image with a circular background
-          // Container(
-          //   width: iconSize,
-          //   height: iconSize,
-          //   decoration: BoxDecoration(
-          //     color: iconBackgroundColor,
-          //     shape: BoxShape.circle,
-          //   ),
-          //   child: ClipOval(
-          //     child: Image.asset(
-          //       imageUrl,
-          //       width: iconSize,
-          //       height: iconSize,
-          //       fit: BoxFit
-          //           .contain, // Ensure the SVG scales well inside the circle
-          //     ),
-          //   ),
-          // ),
-          Container(
-            width: iconSize,
-            height: iconSize,
-            decoration: BoxDecoration(
-              color: iconBackgroundColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon, // Use the icon passed into the widget
-              size: iconSize * 0.6, // Icon size based on the container size
-              color: Colors.black,
-            ),
-            // child: ClipOval(
-            //   child: SvgPicture.asset(
-            //     svgAssetPath, // Use your SVG asset here
-            //     width: iconSize,
-            //     height: iconSize,
-            //     fit: BoxFit
-            //         .contain, // Ensure the SVG scales well inside the circle
-            //   ),
-            // ),
-          ),
-          SizedBox(width: 16),
-          // Column to hold the label and value
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+          // Integrated progress indicator with icon
+          Stack(
+            alignment: Alignment.center,
             children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: valueColor,
+              SizedBox(
+                width: indicatorSize,
+                height: indicatorSize,
+                child: CircularProgressIndicator(
+                  value: progress, // Now properly typed as double
+                  strokeWidth: 6,
+                  backgroundColor: progressBackgroundColor.withOpacity(0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: labelColor,
-                ),
+              Icon(
+                icon,
+                size: indicatorSize * 0.5,
+                color: iconColor,
               ),
             ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${currentValue.toStringAsFixed(0)} / ${targetValue.toStringAsFixed(0)}',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: valueColor,
+                  ),
+                ),
+                // Text(
+                //   '$progressPercentage%',
+                //   style: TextStyle(
+                //     fontSize: 16,
+                //     color: progressColor,
+                //   ),
+                // ),
+                // const SizedBox(height: 4),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: labelColor,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 }
-
-class InfoCardSmall extends StatelessWidget {
+class CompactProgressCard extends StatelessWidget {
   final String label;
-  final String value; // Value is now a double
-  // final String svgAssetPath;
+  final double currentValue;
+  final double targetValue;
   final IconData icon;
-  final Color iconBackgroundColor;
+  final Color iconColor;
+  final Color progressColor;
   final Color valueColor;
-  final Color labelColor;
-  final double cardWidth;
-  final double cardHeight;
-  final double iconSize;
-  // final String imageUrl;
+  final double size;
 
-  InfoCardSmall({
+  const CompactProgressCard({
+    Key? key,
     required this.icon,
     required this.label,
-    required this.value, // Now accepts double for value
-    // required this.svgAssetPath,
-    this.iconBackgroundColor =
-        Colors.transparent, // Default icon background color
+    required this.currentValue,
+    required this.targetValue,
+    this.iconColor = Colors.black,
+    this.progressColor = Colors.blue,
     this.valueColor = Colors.black,
-    this.labelColor = Colors.blueGrey, // Default text color
-    this.cardWidth = 200.0, // Default width of the card
-    this.cardHeight = 150.0, // Default height of the card
-    this.iconSize = 50.0,
-    // required this.imageUrl,
-  });
+    this.size = 105.0,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Safe progress calculation with null/zero checks
+    final double safeTarget = targetValue > 0 ? targetValue : 1.0;
+    final double progress = (currentValue / safeTarget).clamp(0.0, 1.0);
+    final String progressPercentage = (progress * 100).toStringAsFixed(0);
+
     return Container(
-      width: cardWidth,
-      height: cardHeight,
-      padding: const EdgeInsets.all(16.0),
-      decoration:BoxDecoration(
+      width: size,
+      height: size,
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Icon with a circular background
-          Container(
-            width: iconSize,
-            height: iconSize,
-            decoration: BoxDecoration(
-              color: iconBackgroundColor,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon, // Use the icon passed into the widget
-              size: iconSize * 0.6, // Icon size based on the container size
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(height: 8), // Correct vertical spacing
-
-          // Column to hold the label and value
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
+          Stack(
+            alignment: Alignment.center,
             children: [
-              Text(
-                value, // Display the dynamic value
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: valueColor,
+              SizedBox(
+                width: size * 0.6,
+                height: size * 0.6,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 4,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                 ),
               ),
-              SizedBox(height: 8),
-              Text(
-                label, // Display the label
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: labelColor,
+              Container(
+                width: size * 0.3,
+                height: size * 0.4,  // Adjusted height to avoid overflow
+                decoration: BoxDecoration(
+                  color: progressColor.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: size * 0.2,
+                  color: iconColor,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 4),
+          // Label
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+                color: Colors.blueGrey[600],
+              ),
+              overflow: TextOverflow.ellipsis, // Prevent text overflow
+              maxLines: 1,  // Limit to 1 line
+            ),
+          ),
+          // Current/Target values (optional)
+          Flexible(
+            child: Text(
+              '${currentValue.toStringAsFixed(0)}/${targetValue.toStringAsFixed(0)}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 10,
+                color: Colors.grey[500],
+              ),
+              overflow: TextOverflow.ellipsis, // Prevent text overflow
+              maxLines: 1,  // Limit to 1 line
+            ),
           ),
         ],
       ),

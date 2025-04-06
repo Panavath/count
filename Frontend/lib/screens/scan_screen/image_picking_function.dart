@@ -7,7 +7,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../food_input_result_screen.dart';
 
 class ImagePickerHelper {
@@ -61,24 +60,31 @@ class ImagePickerHelper {
     if (selectedFile != null) {
       imageFile = selectedFile;
 
-      print("Sending image to backend...");
+      // Show image preview before confirming
+      bool? confirm = await _showImagePreview(context, imageFile);
 
-      // Upload the image and get food scan results
-      List<ScannedFood>? foodResults = await BackendApi.scanImage(imageFile);
-      print(foodResults);
+      if (confirm != null && confirm) {
+        print("Sending image to backend...");
 
-      if (foodResults != null) {
-        print("Food picture successfully sent to backend");
+        // Upload the image and get food scan results
+        List<ScannedFood>? foodResults = await BackendApi.scanImage(imageFile);
+        print(foodResults);
 
-        // Navigate to ResultsScreen with results
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ResultsScreen(results: foodResults, screenType: ResultScreenType.scan),
-          ),
-        );
+        if (foodResults != null) {
+          print("Food picture successfully sent to backend");
+
+          // Navigate to ResultsScreen with results
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ResultsScreen(results: foodResults, screenType: ResultScreenType.scan),
+            ),
+          );
+        } else {
+          print("Food picture was not sent");
+        }
       } else {
-        print("Food picture was not sent");
+        print("Image discarded by user");
       }
 
       return imageFile; // Return the image for further processing
@@ -88,12 +94,49 @@ class ImagePickerHelper {
     return null;
   }
 
+  // Function to show the image preview and ask for confirmation
+  static Future<bool?> _showImagePreview(BuildContext context, File imageFile) async {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text('Confirm Image'),
+          content: Column(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  image: DecorationImage(
+                    image: FileImage(imageFile),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text('Do you want to proceed with this image?'),
+            ],
+          ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Discard'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   static Future<void> _requestPermission(Permission permission) async {
     if (await permission.isDenied || await permission.isPermanentlyDenied) {
       await permission.request();
     }
     debugPrint("Permission status for $permission: ${await permission.status}");
   }
-
-
 }

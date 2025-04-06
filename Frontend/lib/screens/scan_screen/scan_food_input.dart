@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:count_frontend/screens/scan_screen/image_picking_function.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:image_picker/image_picker.dart';
 import '/utility/app_theme.dart';
 
 class ScanFoodScreen extends StatefulWidget {
@@ -14,38 +13,45 @@ class ScanFoodScreen extends StatefulWidget {
 
 class _ScanFoodScreenState extends State<ScanFoodScreen> {
   File? _image;
-  // final ImagePicker _picker = ImagePicker();
   bool _isImageCaptured = false;
 
+  // This function is responsible for selecting an image
   Future<void> _pickImage() async {
     // Picking image logic using ImagePickerHelper
     File? selectedImage = await ImagePickerHelper.pickImageAndUpload(context);
     if (selectedImage != null) {
-
-      // Additional logic like processing the image
-      print("Processing image: ${selectedImage.path}");
-
       setState(() {
         _image = selectedImage;
-        _isImageCaptured = true;
+        _isImageCaptured = true; // Set the image as captured for confirmation
       });
     }
   }
 
-  void _saveImage() {
-    // Placeholder for save image functionality
-    print("Image saved: ${_image?.path}");
+  // This function will handle the image after user confirms the image
+  void _confirmImage() {
+    // Placeholder for sending image to backend or saving it
+    print("Confirmed image: ${_image?.path}");
 
+    // After confirmation, reset the image or move to next step
     setState(() {
-      _isImageCaptured = false;
+      _isImageCaptured = false; // Reset after confirmation
     });
 
-    Navigator.pop(context);
+    Navigator.pop(context); // Navigate back after confirmation (or proceed as needed)
+  }
+
+  // This function will allow the user to discard the picked image
+  void _cancelImage() {
+    setState(() {
+      _image = null;  // Reset the image
+      _isImageCaptured = false; // Reset the captured status
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Meal Scan', style: AppFonts.heading),
         backgroundColor: AppColors.primaryBlue,
@@ -62,62 +68,30 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
           },
         ),
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: Center(
-              child: _image == null
-                  ? const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(CupertinoIcons.camera_fill, size: 100, color: Colors.grey),
-                        SizedBox(height: 20),
-                        Text(
-                          "Tap the button to capture an image",
-                          style: AppFonts.body,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    )
-                  : Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: MediaQuery.of(context).size.width * 0.9,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            image: DecorationImage(
-                              image: FileImage(_image!),
-                              fit: BoxFit.cover,
-                            ),
+      child: GestureDetector(
+        onTap: _pickImage, // Trigger image picker on tapping anywhere in the body
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // Center the content vertically
+          children: [
+            Expanded(
+              child: Center(
+                child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(CupertinoIcons.camera_fill, size: 100, color: Colors.grey),
+                          SizedBox(height: 20),
+                          Text(
+                            "Tap here to capture an image",
+                            style: AppFonts.body,
+                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Tap the button to detect items in your meal",
-                          style: AppFonts.body,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: CupertinoButton(
-              onPressed: _isImageCaptured ? _saveImage : _pickImage,
-              color: _isImageCaptured ? CupertinoColors.systemGreen : CupertinoColors.activeBlue,
-              borderRadius: BorderRadius.circular(30),
-              padding: const EdgeInsets.all(20),
-              child: Icon(
-                _isImageCaptured ? CupertinoIcons.checkmark_alt : CupertinoIcons.camera_fill,
-                color: Colors.white,
-                size: 40,
+                        ],
+                      )
+                   
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

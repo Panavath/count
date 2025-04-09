@@ -43,7 +43,7 @@ class BackendApi {
     // Prepare the data for the request
     Map<String, dynamic> userData = {
       'user_name': userName,
-      'dob': dobString,  // Ensure the date is in ISO8601 format
+      'dob': dobString, // Ensure the date is in ISO8601 format
       'gender': gender,
       'height': height,
       'weight': weight,
@@ -71,7 +71,6 @@ class BackendApi {
     }
   }
 
-
   // static Future<User> newUser(String userName) async {
   //   Response userRes =
   //       await dio.post('$url/user/', queryParameters: {'user_name': userName});
@@ -82,6 +81,16 @@ class BackendApi {
   //     'Error creating new user data with status: ${userRes.statusCode}',
   //   );
   // }
+
+  static Future<bool> deleteLog(int logId) async {
+    Response deleteRes =
+        await dio.delete('$url/log/food/', queryParameters: {'log_id': logId});
+    if (deleteRes.statusCode == HttpStatus.ok) {
+      return deleteRes.data['rows'] == 1;
+    } else {
+      return false;
+    }
+  }
 
   static Future<User> newLog(
     int userId, {

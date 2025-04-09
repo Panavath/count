@@ -1,3 +1,5 @@
+import 'package:count_frontend/main.dart';
+import 'package:count_frontend/screens/home_screen.dart';
 import 'package:count_frontend/utility/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +16,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _weightController = TextEditingController();
+    final TextEditingController _weightGoalController = TextEditingController();
   final TextEditingController _heightController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
@@ -30,6 +33,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _heightController.dispose();
     _dobController.dispose();
     _usernameController.dispose();
+    _weightGoalController.dispose();
     super.dispose();
   }
 
@@ -190,6 +194,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
+                    _buildTextField(
+                            controller: _weightGoalController,
+                            label: 'Weight Goal (kg)',
+                            icon: Icons.monitor_weight_outlined,
+                            keyboardType: TextInputType.number,
+                            validator: (value) =>
+                                value!.isEmpty ? 'Required' : null,
+                          ),
+                    const SizedBox(height: 16),
                     _buildDateField(context),
                     const SizedBox(height: 16),
                     _buildDropdown(
@@ -321,9 +334,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
         gender: _selectedGender,
         activityLevel: _selectedActivityLevel,
         dob: _selectedDate,
+        weightGoal: double.parse(_weightGoalController.text)
       )
           .then((_) {
-        Navigator.pushReplacementNamed(context, '/');
+        // Navigator.pushReplacementNamed(BuildContext context, '/');
+
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => HomeScreen()));
+
+        // Navigator.of(context).pushNamedAndRemoveUntil('/routeName', (route) => false);
+
+      //    Navigator.pushAndRemoveUntil(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => const BottomNavBarScreen()),
+      //   (Route<dynamic> route) => false, // Remove all previous routes
+      // );
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const BottomNavBarScreen()),
+        (route) => false, // Remove all previous routes (clear stack)
+      );
+     
+
       });
     }
   }

@@ -16,7 +16,8 @@ class ResultsScreen extends StatefulWidget {
   final List<ScannedFood> results;
   final ResultScreenType screenType;
 
-  const ResultsScreen({super.key, required this.results, required this.screenType});
+  const ResultsScreen(
+      {super.key, required this.results, required this.screenType});
 
   @override
   State<ResultsScreen> createState() => _ResultsScreenState();
@@ -46,6 +47,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
         searchFood();
       });
     }
+  }
+
+  void resetState() {
+    foodList = [];
+    setState(() {});
   }
 
   void _toggleSelection(ScannedFood food) {
@@ -94,7 +100,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   final TextEditingController foodNameController = TextEditingController();
-  final TextEditingController dateController = TextEditingController(); // Date controller
+  final TextEditingController dateController =
+      TextEditingController(); // Date controller
 
   // Show dialog for food name, meal type input, and date picker
   Future<void> _showFoodInputDialog(BuildContext context) async {
@@ -189,20 +196,21 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   mealTypeString: selectedMealType,
                   foods: selectedFoods,
                 );
+                Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
 
                 // Show confirmation dialog
                 _showConfirmationDialog();
 
                 // Close the dialog
-                Navigator.of(context).pop();
-                Navigator.popUntil(context, ModalRoute.withName('/'));
+                resetState();
+                
               },
               child: const Text('Save'),
             ),
             // Cancel button
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.pushNamed(context, '/scan'); // Close the dialog
               },
               child: const Text('Cancel'),
             ),
@@ -363,7 +371,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
     );
   }
 }
-
 
 class SearchWidget extends StatefulWidget {
   const SearchWidget({

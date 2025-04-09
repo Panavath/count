@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Import the flutter_svg package
 
 import 'package:flutter/material.dart';
-
 class ProgressInfoCard extends StatelessWidget {
   final String label;
   final double currentValue;
@@ -35,7 +34,6 @@ class ProgressInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure we don't divide by zero and properly convert to double
     final double progress = targetValue > 0 
         ? (currentValue / targetValue).clamp(0.0, 1.0).toDouble()
         : 0.0;
@@ -60,16 +58,24 @@ class ProgressInfoCard extends StatelessWidget {
                 width: indicatorSize,
                 height: indicatorSize,
                 child: CircularProgressIndicator(
-                  value: progress, // Now properly typed as double
+                  value: progress,
                   strokeWidth: 6,
                   backgroundColor: progressBackgroundColor.withOpacity(0.2),
                   valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                 ),
               ),
-              Icon(
-                icon,
-                size: indicatorSize * 0.5,
-                color: iconColor,
+              Container(
+                width: indicatorSize * 0.6,  // Slightly larger than icon
+                height: indicatorSize * 0.6,
+                decoration: BoxDecoration(
+                  color: progressColor.withOpacity(0.2),  // Matching small card style
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: indicatorSize * 0.4,  // Adjusted size
+                  color: iconColor,
+                ),
               ),
             ],
           ),
@@ -87,14 +93,6 @@ class ProgressInfoCard extends StatelessWidget {
                     color: valueColor,
                   ),
                 ),
-                // Text(
-                //   '$progressPercentage%',
-                //   style: TextStyle(
-                //     fontSize: 16,
-                //     color: progressColor,
-                //   ),
-                // ),
-                // const SizedBox(height: 4),
                 Text(
                   label,
                   style: TextStyle(
@@ -142,7 +140,7 @@ class CompactProgressCard extends StatelessWidget {
 
     return Container(
       width: size,
-      height: size,
+      height: size + 10,
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -175,7 +173,7 @@ class CompactProgressCard extends StatelessWidget {
               ),
               Container(
                 width: size * 0.3,
-                height: size * 0.4,  // Adjusted height to avoid overflow
+                height: size * 0.4,  
                 decoration: BoxDecoration(
                   color: progressColor.withOpacity(0.2),
                   shape: BoxShape.circle,
@@ -208,8 +206,8 @@ class CompactProgressCard extends StatelessWidget {
               '${currentValue.toStringAsFixed(0)}/${targetValue.toStringAsFixed(0)}',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 10,
-                color: Colors.grey[500],
+                fontSize: 12,
+                color: Colors.black,
               ),
               overflow: TextOverflow.ellipsis, // Prevent text overflow
               maxLines: 1,  // Limit to 1 line

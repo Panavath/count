@@ -33,6 +33,7 @@ class HomeScreen extends StatelessWidget {
     required double cardHeight,
     required Color borderColor,
     required Color progressColor,
+    required Color iconColor,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -44,12 +45,14 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       child: CompactProgressCard(
-        iconColor: progressColor,
+        
+        iconColor: iconColor,
         progressColor: progressColor,
         label: label,
         icon: icon,
         currentValue: currentValue, 
         targetValue: targetValue,
+        
       ),
     );
   }
@@ -137,6 +140,7 @@ class HomeScreen extends StatelessWidget {
               child: ProgressInfoCard(
                 progressColor: Colors.orange.shade600,
                 
+                
                 label: 'CALORIES',
                 icon: HugeIcons.strokeRoundedFire03,
                 cardWidth: MediaQuery.of(context).size.width * 0.85,
@@ -151,6 +155,7 @@ class HomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 buildCardWithBorder(
+                  iconColor: Colors.black,
                   label: 'PROTEIN',
                   icon: HugeIcons.strokeRoundedSteak,
                   iconBackgroundColor: Colors.red.shade300,
@@ -163,6 +168,7 @@ class HomeScreen extends StatelessWidget {
                   progressColor: Colors.red,
                 ),
                 buildCardWithBorder(
+                  iconColor: Colors.black,
                   label: 'CARBS',
                   icon: HugeIcons.strokeRoundedRiceBowl01,
                   iconBackgroundColor: Colors.green.shade300,
@@ -175,9 +181,10 @@ class HomeScreen extends StatelessWidget {
                   progressColor: Colors.green,
                 ),
                 buildCardWithBorder(
+                  iconColor: Colors.black,
                   label: 'FAT',
                   icon: HugeIcons.strokeRoundedFrenchFries01,
-                  iconBackgroundColor: Colors.yellow.shade300,
+                  iconBackgroundColor: Colors.yellow,
                   iconSize: 32,
                   cardWidth: MediaQuery.of(context).size.width * 0.25,
                   cardHeight: 125,
@@ -235,14 +242,14 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Image.asset(
                 'assets/icon/Count.png',
-                fit: BoxFit.contain,
-                height: 50,
+                fit: BoxFit.fill,
+                height: 30,
               ),
             ),
-            const SizedBox(width: 50),
+            const SizedBox(width: 20),
           ],
         ),
       ),

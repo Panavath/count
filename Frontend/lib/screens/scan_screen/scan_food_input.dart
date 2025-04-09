@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:count_frontend/enums/screen_types.dart';
+import 'package:count_frontend/screens/food_input_result_screen.dart';
 import 'package:count_frontend/screens/scan_screen/image_picking_function.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '/utility/app_theme.dart';
@@ -16,16 +19,51 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
   bool _isImageCaptured = false;
 
   // This function is responsible for selecting an image
-  Future<void> _pickImage() async {
-    // Picking image logic using ImagePickerHelper
+Future<void> _pickImage() async {
+  try {
     File? selectedImage = await ImagePickerHelper.pickImageAndUpload(context);
     if (selectedImage != null) {
       setState(() {
         _image = selectedImage;
-        _isImageCaptured = true; // Set the image as captured for confirmation
+        _isImageCaptured = true;
       });
     }
+  } catch (e) {
+    // Handle the 500 error specifically
+    if (e is DioException && e.response?.statusCode == 500) {
+      _showDetectionFailedDialog();
+    } else {
+      // Handle other errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred while processing the image')),
+      );
+    }
   }
+}
+
+void _showDetectionFailedDialog() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Detection Failed'),
+      content: const Text('The image couldn\'t be detected. Please try again or enter manually.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Try Again'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // Close the dialog
+            ResultsScreen(
+              results: [], screenType: ResultScreenType.manual);
+          },
+          child: const Text('Enter Manually'),
+        ),
+      ],
+    ),
+  );
+}
 
   // This function will handle the image after user confirms the image
   void _confirmImage() {
@@ -51,13 +89,14 @@ class _ScanFoodScreenState extends State<ScanFoodScreen> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      
       backgroundColor: Colors.white,
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Meal Scan', style: AppFonts.heading),
         backgroundColor: AppColors.primaryBlue,
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: const Icon(CupertinoIcons.back, color: Colors.white),
+          child: const Icon(CupertinoIcons.back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
         trailing: CupertinoButton(

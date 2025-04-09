@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         initialRoute: '/signup',
         routes: {
           '/signup': (context) => RegisterScreen(),
-          // '/': (context) => const HomeScreen(),
+          // '/': (context) => const HomeScreen(),k;
           '/': (context) => const BottomNavBarScreen(),
           '/results': (context) => const ResultsScreen(
               results: [], screenType: ResultScreenType.manual),
@@ -58,6 +58,12 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     const ResultsScreen(results: [], screenType: ResultScreenType.manual),
     const SettingsScreen(), // Results Screen
   ];
+
+  void toHomeScreen() {
+    setState(() {
+      _currentIndex = 0;
+    });
+  }
 
   // Method to handle the screen switching
   void onTabTapped(int index) {

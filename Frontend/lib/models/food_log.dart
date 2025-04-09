@@ -79,4 +79,13 @@ class FoodLog {
   return totalCarb;
 }
 
+@override
+  bool operator ==(Object other) {
+    return other is FoodLog && foodLogId == other.foodLogId;
+  }
+  
+  @override
+  int get hashCode => foodLogId.hashCode;
+  
+
 }

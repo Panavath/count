@@ -1,6 +1,7 @@
 import 'package:count_frontend/api/back_end_api.dart';
 import 'package:count_frontend/enums/screen_types.dart';
 import 'package:count_frontend/models/scanned_food.dart';
+import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -64,24 +65,38 @@ class ImagePickerHelper {
       bool? confirm = await _showImagePreview(context, imageFile);
 
       if (confirm != null && confirm) {
-        print("Sending image to backend...");
+        try {
+          print("Sending image to backend...");
 
-        // Upload the image and get food scan results
-        List<ScannedFood>? foodResults = await BackendApi.scanImage(imageFile);
-        print(foodResults);
+          // Upload the image and get food scan results
+          List<ScannedFood>? foodResults = await BackendApi.scanImage(imageFile);
+          print(foodResults);
 
-        if (foodResults != null) {
-          print("Food picture successfully sent to backend");
+          if (foodResults != null) {
+            print("Food picture successfully sent to backend");
 
-          // Navigate to ResultsScreen with results
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ResultsScreen(results: foodResults, screenType: ResultScreenType.scan),
-            ),
-          );
-        } else {
-          print("Food picture was not sent");
+            // Navigate to ResultsScreen with results
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultsScreen(results: foodResults, screenType: ResultScreenType.scan),
+              ),
+            );
+          } else {
+            print("Food picture was not sent");
+          }
+        } on DioException catch (e) {
+          // Handle Dio errors (including 500 errors)
+          print("Backend error: ${e.message}");
+          
+          if (e.response?.statusCode == 500) {
+            _showDetectionFailedDialog(context);
+          } else {
+            _showErrorDialog(context, "Failed to process image. Please try again.");
+          }
+        } catch (e) {
+          print("Unexpected error: $e");
+          _showErrorDialog(context, "An unexpected error occurred.");
         }
       } else {
         print("Image discarded by user");
@@ -92,6 +107,46 @@ class ImagePickerHelper {
 
     print("No image selected");
     return null;
+  }
+
+  static void _showDetectionFailedDialog(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Detection Failed'),
+        content: const Text('The image couldn\'t be detected. Please try again or enter manually.'),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Try Again'),
+          ),
+          CupertinoDialogAction(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+              // Add your manual entry navigation here
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => ManualEntryScreen()));
+            },
+            child: const Text('Enter Manually'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _showErrorDialog(BuildContext context, String message) {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          CupertinoDialogAction(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   // Function to show the image preview and ask for confirmation

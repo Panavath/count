@@ -13,19 +13,27 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   void register(context) async {
-    showModalBottomSheet(
-        context: context, builder: (context) => _RegisterModal());
+    print("User is not registered. Navigating to Register Screen.");
+    // Navigate to Register Screen
+    Navigator.pushNamed(context, '/signup');
+  }
+
+  Widget _buildDivider() {
+    return const Divider(color: Colors.grey, thickness: 1, height: 20, indent: 30, endIndent: 30);
   }
 
   Widget buildCardWithBorder({
     required String label,
-    required String value,
+    required double currentValue,
+    required double targetValue,
     required IconData icon,
     required Color iconBackgroundColor,
     required double iconSize,
     required double cardWidth,
     required double cardHeight,
     required Color borderColor,
+    required Color progressColor,
+    required Color iconColor,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -36,14 +44,15 @@ class HomeScreen extends StatelessWidget {
           width: 10,
         ),
       ),
-      child: InfoCardSmall(
+      child: CompactProgressCard(
+        
+        iconColor: iconColor,
+        progressColor: progressColor,
         label: label,
-        iconBackgroundColor: iconBackgroundColor,
-        value: value,
         icon: icon,
-        iconSize: iconSize,
-        cardWidth: cardWidth,
-        cardHeight: cardHeight,
+        currentValue: currentValue, 
+        targetValue: targetValue,
+        
       ),
     );
   }
@@ -51,9 +60,12 @@ class HomeScreen extends StatelessWidget {
   Map<String, List<FoodLog>> groupFoodLogsByDate(List<FoodLog> foodLogs) {
     Map<String, List<FoodLog>> groupedLogs = {};
 
+    if (foodLogs.isEmpty) {
+      return groupedLogs;  // Return an empty map if no logs are present
+    }
+
     for (var log in foodLogs) {
-      String dateLabel =
-          formatDate(log.date); // Format the date (use DateFormat as required)
+      String dateLabel = formatDate(log.date); // Format the date
       groupedLogs.putIfAbsent(dateLabel, () => []).add(log);
     }
 
@@ -92,15 +104,16 @@ class HomeScreen extends StatelessWidget {
 
       case AsyncValueState.success:
         User user = provider.currentUser.data!; // Get the current user data
-        final foodLog = user.foodLogs.isNotEmpty ? user.foodLogs[0] : null;
 
-        final groupedLogs = groupFoodLogsByDate(user.foodLogs);
+        // Check if the user's foodLogs are not null and not empty
+        final foodLogs = user.foodLogs ?? [];
+        final groupedLogs = groupFoodLogsByDate(foodLogs);
 
-       double totalCalories = FoodLog.getTotalCalories(user.foodLogs);
-       double totalProtein = FoodLog.getTotalProtein(user.foodLogs);
-       double totalFat = FoodLog.getTotalFat(user.foodLogs);
-       double totalCarbs = FoodLog.getTotalCarb(user.foodLogs);
-
+        // Safely calculate totals with null checks
+        double totalCalories = FoodLog.getTotalCalories(foodLogs);
+        double totalProtein = FoodLog.getTotalProtein(foodLogs);
+        double totalFat = FoodLog.getTotalFat(foodLogs);
+        double totalCarbs = FoodLog.getTotalCarb(foodLogs);
 
         return Column(
           children: [
@@ -110,76 +123,85 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text("Today",
-                      textScaler: TextScaler.linear(1),
-                      style:
-                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
             SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: Colors.transparent, // Background color of the card
-                borderRadius: BorderRadius.circular(32), // Rounded corners
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(32),
                 border: Border.all(
                   color: Colors.blueGrey.shade100,
-                  width: 8, // Border width
+                  width: 8,
                 ),
               ),
-              child: InfoCard(
+              child: ProgressInfoCard(
+                progressColor: Colors.orange.shade600,
+                
+                
                 label: 'CALORIES',
-                iconBackgroundColor: Colors.orange.shade300,
-                value: foodLog != null
-                    ? "${totalCalories} kcal"
-                    : "0 kcal",
                 icon: HugeIcons.strokeRoundedFire03,
-                iconSize: 100,
                 cardWidth: MediaQuery.of(context).size.width * 0.85,
                 cardHeight: 110,
+                currentValue: totalCalories,
+                targetValue: user.caloriesGoal ?? 0.0,
               ),
             ),
-            SizedBox(height: 10),
+            _buildDivider(),
+            SizedBox(height: 1),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                // Using the new method to create the small cards with borders
                 buildCardWithBorder(
+                  iconColor: Colors.black,
                   label: 'PROTEIN',
-                  value:"${totalProtein > 0 ? totalProtein.toStringAsFixed(1) : '0'} g",
                   icon: HugeIcons.strokeRoundedSteak,
                   iconBackgroundColor: Colors.red.shade300,
                   iconSize: 32,
                   cardWidth: MediaQuery.of(context).size.width * 0.25,
-                  cardHeight: 125,
-                  borderColor: Colors.blueGrey.shade100, // Grey border color
+                  cardHeight: 140,
+                  borderColor: Colors.blueGrey.shade100, 
+                  currentValue: totalProtein, 
+                  targetValue: user.proteinGoal ?? 0.0, 
+                  progressColor: Colors.red,
                 ),
                 buildCardWithBorder(
+                  iconColor: Colors.black,
                   label: 'CARBS',
-                  value: "${totalCarbs > 0 ? totalCarbs.toStringAsFixed(1) : '0'} g",
                   icon: HugeIcons.strokeRoundedRiceBowl01,
                   iconBackgroundColor: Colors.green.shade300,
                   iconSize: 32,
                   cardWidth: MediaQuery.of(context).size.width * 0.25,
                   cardHeight: 125,
-                  borderColor: Colors.blueGrey.shade100, // Grey border color
+                  borderColor: Colors.blueGrey.shade100, 
+                  currentValue: totalCarbs, 
+                  targetValue: user.carbsGoal ?? 0.0, 
+                  progressColor: Colors.green,
                 ),
                 buildCardWithBorder(
+                  iconColor: Colors.black,
                   label: 'FAT',
-                  value: "${totalFat > 0 ? totalFat.toStringAsFixed(1) : '0'} g",
                   icon: HugeIcons.strokeRoundedFrenchFries01,
-                  iconBackgroundColor: Colors.yellow.shade300,
+                  iconBackgroundColor: Colors.yellow,
                   iconSize: 32,
                   cardWidth: MediaQuery.of(context).size.width * 0.25,
                   cardHeight: 125,
-                  borderColor: Colors.blueGrey.shade100, // Grey border color
+                  borderColor: Colors.blueGrey.shade100, 
+                  currentValue: totalFat, 
+                  targetValue: user.fatGoal ?? 0.0, 
+                  progressColor: Colors.yellow,
                 ),
               ],
             ),
-          
-            ListView.builder(
-               physics: NeverScrollableScrollPhysics(),
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
+            _buildDivider(),
+            // Check if groupedLogs is not empty before building the list
+            if (groupedLogs.isNotEmpty)
+              ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                scrollDirection: Axis.vertical,
                 itemCount: groupedLogs.length,
                 itemBuilder: (context, index) {
                   String dateLabel = groupedLogs.keys.elementAt(index);
@@ -189,7 +211,9 @@ class HomeScreen extends StatelessWidget {
                     logsForDate: logsForDate,
                   );
                 },
-              ),
+              )
+            else
+              const Center(child: Text("No logs available for today.")),
           ],
         );
 
@@ -210,40 +234,26 @@ class HomeScreen extends StatelessWidget {
     UserDataProvider provider = context.watch<UserDataProvider>();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton(
-              icon: Icon(HugeIcons.strokeRoundedUser), // Left icon
-              onPressed: () {
-                debugPrint("User clicked");
-              },
-            ),
-            const SizedBox(width: 50),
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(16.0),
               child: Image.asset(
                 'assets/icon/Count.png',
-                fit: BoxFit.contain,
-                height: 50,
+                fit: BoxFit.fill,
+                height: 30,
               ),
             ),
-            const SizedBox(width: 50),
-            IconButton(
-              highlightColor: Colors.black,
-              icon: const Icon(Icons.search, color: Colors.black), // Right icon
-              onPressed: () {
-                debugPrint("Search clicked");
-              },
-            ),
+            const SizedBox(width: 20),
           ],
         ),
       ),
       body: SingleChildScrollView(
-        
         child: Container(
           decoration: BoxDecoration(color: Colors.white),
           child: Padding(
@@ -259,15 +269,6 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     FloatingActionButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, '/results');
-                      },
-                      backgroundColor: Colors.blue.shade300,
-                      heroTag: null,
-                      child: const Icon(Icons.add),
-                    ),
-                    const SizedBox(height: 16),
-                    FloatingActionButton(
-                      onPressed: () {
                         Navigator.pushNamed(context, '/scan');
                       },
                       backgroundColor: Colors.blue.shade300,
@@ -277,55 +278,6 @@ class HomeScreen extends StatelessWidget {
                   ],
                 )
               : null,
-    );
-  }
-}
-
-class _RegisterModal extends StatefulWidget {
-  @override
-  State<_RegisterModal> createState() => _RegisterModalState();
-}
-
-class _RegisterModalState extends State<_RegisterModal> {
-  final TextEditingController controller = TextEditingController();
-
-  void onAdd() {
-    if (controller.text.isEmpty) return;
-
-    UserDataProvider user = context.read<UserDataProvider>();
-    user.signUp(controller.text);
-    Navigator.pop(context);
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          TextField(
-            controller: controller,
-            decoration: const InputDecoration(label: Text('Username')),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              SizedBox(
-                width: 200,
-                child: ElevatedButton(
-                    onPressed: onAdd, child: const Text('Register')),
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
